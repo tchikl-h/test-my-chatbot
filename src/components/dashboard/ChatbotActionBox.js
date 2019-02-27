@@ -1,11 +1,11 @@
 import React, { PropTypes } from "react";
 import Paper from "material-ui/Paper";
-import { white, grey800 } from "material-ui/styles/colors";
+import { grey800 } from "material-ui/styles/colors";
 import { typography } from "material-ui/styles";
 
 class ChatbotActionBox extends React.Component {
   render() {
-    const { color, title, value, Icon } = this.props;
+    const { color, value, Icon } = this.props;
 
     const styles = {
       paperSize: {

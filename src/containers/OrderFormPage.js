@@ -8,18 +8,15 @@ import RaisedButton from "material-ui/RaisedButton";
 // import DatePicker from 'material-ui/DatePicker';
 import Dialog from "material-ui/Dialog"; // , { DialogActions, DialogContent, DialogContentText, DialogTitle}
 import { grey400 } from "material-ui/styles/colors";
-import Divider from "material-ui/Divider";
 import PageBase from "../components/PageBase";
-import IconButton from "material-ui/IconButton";
 import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
 // import {Card} from 'material-ui/Card';
-import ActionDelete from "material-ui/svg-icons/action/delete";
 import { getOrder, updateOrder, addOrder, newOrder } from "../actions/order";
 import { loadCustomers } from "../actions/customer";
 import { loadProducts, loadCategories } from "../actions/product";
 
-import { FormsyText, FormsySelect, FormsyDate } from "formsy-material-ui/lib"; // FormsyDate
+import { FormsyText, FormsySelect } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import MenuItem from "material-ui/MenuItem";
 import CircularProgress from "material-ui/CircularProgress";

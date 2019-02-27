@@ -1,10 +1,4 @@
 import React from "react";
-import {
-  cyan600,
-  pink600,
-  purple600,
-  orange600
-} from "material-ui/styles/colors";
 import NewOrders from "../components/dashboard/NewOrders";
 import MonthlySales from "../components/dashboard/MonthlySales";
 import BrowserUsage from "../components/dashboard/BrowserUsage";

@@ -1,45 +1,19 @@
 import React, { PropTypes } from "react";
 import { Link } from "react-router";
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn
-} from "material-ui/Table";
 import FloatingActionButton from "material-ui/FloatingActionButton";
-import ContentCreate from "material-ui/svg-icons/content/create";
-import ActionDelete from "material-ui/svg-icons/action/delete";
 import ContentAdd from "material-ui/svg-icons/content/add";
-import Search from "material-ui/svg-icons/action/search";
-import ThumbUp from "material-ui/svg-icons/action/thumb-up";
 import ShoppingCart from "material-ui/svg-icons/action/shopping-cart";
-import Assessment from "material-ui/svg-icons/action/assessment";
-import Face from "material-ui/svg-icons/action/face";
 import {
-  teal500,
   pink500,
   pink600,
-  grey200,
   grey500,
   grey600,
-  green400,
-  cyan600,
-  purple600,
-  orange600,
   white
 } from "material-ui/styles/colors";
-import PageBase from "../components/PageBase";
 // import Data from '../data';
 import { connect } from "react-redux";
 import { loadOrders, deleteOrder } from "../actions/order";
-import Dialog from "material-ui/Dialog";
 import FlatButton from "material-ui/FlatButton";
-import Drawer from "material-ui/Drawer";
-import RaisedButton from "material-ui/RaisedButton";
-import TextField from "material-ui/TextField";
-import Snackbar from "material-ui/Snackbar";
 import { typography } from "material-ui/styles";
 import InfoBox from "../components/dashboard/InfoBox";
 
