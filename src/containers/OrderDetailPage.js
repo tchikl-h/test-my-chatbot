@@ -41,9 +41,10 @@ import RaisedButton from "material-ui/RaisedButton";
 import TextField from "material-ui/TextField";
 import Snackbar from "material-ui/Snackbar";
 import { typography } from "material-ui/styles";
-import InfoBox from "../components/dashboard/InfoBox";
+import ChatbotBox from "../components/dashboard/ChatbotBox";
+import ChatbotActionBox from "../components/dashboard/ChatbotActionBox";
 
-class OrderListPage extends React.Component {
+class OrderDetailPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -242,34 +243,57 @@ class OrderListPage extends React.Component {
 
     return (
         <div>
-          <h3 style={styles.navigation}>Chatbots</h3>
-          <Link to="/order">
-            <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
-              <ContentAdd />
-            </FloatingActionButton>
-          </Link>
+          <h3 style={styles.navigation}>Chatbots / {this.props.orderList[0].reference}</h3>
           <div className="row">
-          {
-            this.props.orderList.map(item => (
-                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-4 m-b-15 ">
-                
-                  <Link to={`/order/${item.id}`}>
-                    <InfoBox
-                      Icon={ShoppingCart}
-                      color={pink600}
-                      title={item.reference}
-                      value={item.price}
-                    />
-                  </Link>
-                </div>
-          ))}
+            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-4 m-b-15 ">
+              <ChatbotBox
+                Icon={ShoppingCart}
+                color={pink600}
+                title={this.props.orderList[0].reference}
+                value="Chatbot specialized in HR assistant"
+              />
+            </div>
+          </div>
+
+          <div className="row" style={{width: 518}}>
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
+              <ChatbotActionBox
+                Icon="../assets/img/list-icon.png"
+                title={this.props.orderList[0].reference}
+                value="Tests list"
+              />
+            </div>
+
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
+              <ChatbotActionBox
+                Icon="../assets/img/chat-icon.png"
+                title={this.props.orderList[0].reference}
+                value="Register test"
+              />
+            </div>
+
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
+              <ChatbotActionBox
+                Icon="../assets/img/log-icon.png"
+                title={this.props.orderList[0].reference}
+                value="Logs"
+              />
+            </div>
+
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
+              <ChatbotActionBox
+                Icon="../assets/img/git-icon.png"
+                title={this.props.orderList[0].reference}
+                value="Versioning"
+              />
+            </div>
           </div>
         </div>
     );
   }
 }
 
-OrderListPage.propTypes = {
+OrderDetailPage.propTypes = {
   orderList: PropTypes.array,
   getAllOrders: PropTypes.func.isRequired,
   deleteOrder: PropTypes.func.isRequired,
@@ -305,4 +329,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderListPage);
+export default connect(mapStateToProps, mapDispatchToProps)(OrderDetailPage);

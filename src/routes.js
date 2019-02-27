@@ -10,6 +10,7 @@ import CustomerFormPage from "./containers/CustomerFormPage";
 
 import OrderListPage from "./containers/OrderListPage";
 import OrderFormPage from "./containers/OrderFormPage";
+import OrderDetailPage from "./containers/OrderDetailPage";
 import ProductFormPage from "./containers/ProductFormPage";
 import ProductListPage from "./containers/ProductListPage";
 
@@ -22,7 +23,8 @@ export default (
       <Route path="customer" component={CustomerFormPage} />
       <Route path="customer/:id" component={CustomerFormPage} />
       <Route path="order" component={OrderFormPage} />
-      <Route path="order/:id" component={OrderFormPage} />
+      <Route path="order/:id" component={OrderDetailPage} />
+      <Route path="order/:id/edit" component={OrderFormPage} />
       <Route path="product" component={ProductFormPage} />
       <Route path="product/:id" component={ProductFormPage} />
       <Route path="customers" component={CustomerListPage} />

@@ -30,37 +30,27 @@ class OrderFormPage extends React.Component {
     super(props);
     autoBind(this);
     this.state = {
-      isFetching: this.props.routeParams.id ? true : false,
+      isFetching: this.props.routeParams.id ? true : false, // fetching :id of the chatbot if exists
       categoryId: 0,
       product: null,
       open: false,
       order: {}
     };
-
-    // autobind(this);
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleClick = this.handleClick.bind(this);
-    // this.handleCancel = this.handleCancel.bind(this);
-    // this.handleOk = this.handleOk.bind(this);
-    // this.enableButton = this.enableButton.bind(this);
-    // this.notifyFormError = this.notifyFormError.bind(this);
-    // this.disableButton = this.disableButton.bind(this);
-    // this.removeProduct = this.removeProduct.bind(this);
-    // this.handleCategoryChange = this.handleCategoryChange.bind(this);
-    // this.handleProductChange = this.handleProductChange.bind(this);
   }
 
   componentWillMount() {
+    // get existing chatbot
     if (this.props.routeParams && this.props.routeParams.id) {
       this.props.getOrder(this.props.routeParams.id);
       this.props.getAllCustomers();
       this.props.getCategoryList();
     } else {
-      this.props.newOrder();
+      this.props.newOrder(); // create a new chatbot
     }
   }
 
   componentWillReceiveProps(nextProps) {
+    // detect if fetching of not
     if (
       (this.props.order &&
         nextProps.order &&
@@ -227,17 +217,17 @@ class OrderFormPage extends React.Component {
       return <CircularProgress />;
     } else {
       return (
-        <PageBase title="Order" navigation="Application / Order ">
+        <PageBase title="Chatbot" navigation="Chatbots / creation">
           <Formsy.Form
             onValid={this.enableButton}
             onInvalid={this.disableButton}
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cols={3} cellHeight={60}>
+            <GridList cols={1} cellHeight={60}>
               <GridTile>
                 <FormsySelect
-                  floatingLabelText="Customer"
+                  floatingLabelText="Owner"
                   value={order.customer ? order.customer.id : 0}
                   onChange={this.handleChange}
                   style={styles.customWidth}
@@ -258,95 +248,11 @@ class OrderFormPage extends React.Component {
                   ))}
                 </FormsySelect>
               </GridTile>
-              <GridTile>
-                <FormsyText
-                  hintText="Reference"
-                  floatingLabelText="Reference"
-                  name="reference"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={order.reference ? order.reference : ""}
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isWords: "Please provide valid reference name",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="Amount"
-                  floatingLabelText="Amount"
-                  fullWidth={true}
-                  name="price"
-                  onChange={this.handleChange}
-                  validations={{
-                    isNumeric: true
-                  }}
-                  validationErrors={{
-                    isNumeric: "Please provide valid price",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  value={order.amount}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="Quantity"
-                  floatingLabelText="Quantity"
-                  fullWidth={true}
-                  type="number"
-                  name="quantity"
-                  onChange={this.handleChange}
-                  value={order.products ? order.products.length : 0}
-                  validations={{
-                    isInt: true
-                  }}
-                  validationErrors={{
-                    isInt: "Please provide a valid password",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-              <GridTile>
-                <FormsyDate
-                  hintText="Order Date"
-                  floatingLabelText="Order Date"
-                  disabled={true}
-                  name="orderDate"
-                  onChange={this.handleChange}
-                  value={
-                    order.orderDate ? new Date(order.orderDate) : new Date()
-                  }
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyDate
-                  hintText="Shipped Date"
-                  floatingLabelText="Shipped Date"
-                  fullWidth={false}
-                  name="shippedDate"
-                  onChange={this.handleChange}
-                  value={
-                    order.shippedDate ? new Date(order.shippedDate) : new Date()
-                  }
-                  required
-                />
-              </GridTile>
 
               <GridTile>
                 <FormsyText
                   hintText="Address"
-                  floatingLabelText="Address"
+                  floatingLabelText="Name"
                   name="shipAddress.address"
                   onChange={this.handleChange}
                   fullWidth={true}
@@ -369,7 +275,7 @@ class OrderFormPage extends React.Component {
               <GridTile>
                 <FormsyText
                   hintText="City"
-                  floatingLabelText="City"
+                  floatingLabelText="Description"
                   name="reference"
                   onChange={this.handleChange}
                   fullWidth={true}
@@ -392,7 +298,7 @@ class OrderFormPage extends React.Component {
               <GridTile>
                 <FormsyText
                   hintText="Country"
-                  floatingLabelText="Country"
+                  floatingLabelText="Client access token"
                   name="reference"
                   onChange={this.handleChange}
                   fullWidth={true}
@@ -415,7 +321,7 @@ class OrderFormPage extends React.Component {
               <GridTile>
                 <FormsyText
                   hintText="Zip Code"
-                  floatingLabelText="Zip Code"
+                  floatingLabelText="Developer access token"
                   name="reference"
                   onChange={this.handleChange}
                   fullWidth={true}
@@ -436,37 +342,6 @@ class OrderFormPage extends React.Component {
               </GridTile>
             </GridList>
 
-            <p style={styles.productList}>Product List: </p>
-            <Divider />
-
-            {order.products && (
-              <div>
-                <GridList cols={1} cellHeight={60}>
-                  {order.products.map((product, index) => (
-                    <GridTile key={index}>
-                      <div style={styles.productItem}>
-                        <span>
-                          {product.productName}
-                          <p>
-                            {" "}
-                            Price: AUD ${product.unitPrice}
-                            <IconButton
-                              style={styles.productDeleteIcon}
-                              onClick={() => this.removeProduct(product)}
-                            >
-                              <ActionDelete />
-                            </IconButton>
-                          </p>
-                        </span>
-                      </div>
-                    </GridTile>
-                  ))}
-                </GridList>
-              </div>
-            )}
-
-            <Divider />
-
             <div style={styles.buttons}>
               <Link to="/orders">
                 <RaisedButton label="Cancel" />
@@ -479,13 +354,6 @@ class OrderFormPage extends React.Component {
                 onClick={() => this.handleClick(event)}
                 primary={true}
                 disabled={!this.state.canSubmit}
-              />
-              <RaisedButton
-                label="Add"
-                style={styles.saveButton}
-                type="button"
-                onClick={() => this.handleClick(event, "AddProduct")}
-                primary={true}
               />
             </div>
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}

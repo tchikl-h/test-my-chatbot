@@ -13,11 +13,11 @@ import ReactSVG from 'react-svg'
 
 const data = {
   menus: [
-    { text: "Dashboard", icon: <ReactSVG src="./menu-logo/dashboard-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
-    { text: "Chatbots", icon: <ReactSVG src="./menu-logo/robot-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/orders" },
-    { text: "Team", icon: <ReactSVG src="./menu-logo/team-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/customers" },
-    { text: "History", icon: <ReactSVG src="./menu-logo/history-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/products" },
-    { text: "About us", icon: <ReactSVG src="./menu-logo/about-us-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/about" }
+    { text: "Dashboard", icon: <ReactSVG src="./assets/menu-logo/dashboard-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
+    { text: "Chatbots", icon: <ReactSVG src="./assets/menu-logo/robot-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/orders" },
+    { text: "Team", icon: <ReactSVG src="./assets/menu-logo/team-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/customers" },
+    { text: "History", icon: <ReactSVG src="./assets/menu-logo/history-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/products" },
+    { text: "About us", icon: <ReactSVG src="./assets/menu-logo/about-us-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/about" }
   ],
   signOutMenus: [
     { text: "Sign out", icon: <SettingsPower />, link: "/login" },

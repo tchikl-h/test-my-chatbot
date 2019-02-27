@@ -16,8 +16,8 @@ class LoginPage extends React.Component {
 
     this.state = {
       canSubmit: false,
-      username: "Admin@test.com",
-      password: "password",
+      username: "herve.tchikladze@epitech.eu",
+      password: "guest123",
       formError: "",
       errorMessage: props.errorMessage,
       styles: {
@@ -156,8 +156,8 @@ class LoginPage extends React.Component {
         <div>
           <div style={styles.loginContainer}>
             <Paper style={styles.paper}>
-              <p style={styles.formHeader}>React Redux CRM</p>
-              <p style={styles.subHeader}>Version 1.1.0</p>
+              <p style={styles.formHeader}>Test my chatbot</p>
+              <p style={styles.subHeader}>Version 1.0</p>
               <Formsy.Form
                 onValid={this.enableButton}
                 onInvalid={this.disableButton}
