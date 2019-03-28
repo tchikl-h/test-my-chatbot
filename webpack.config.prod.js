@@ -28,7 +28,7 @@ export default {
 
     new webpack.DefinePlugin(GLOBALS),
 
-    new ExtractTextPlugin('[name].[contenthash].css'),
+    new ExtractTextPlugin('[name].[hash].css'),
 
     new HtmlWebpackPlugin({
       template: 'src/index.ejs',

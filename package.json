@@ -25,6 +25,9 @@
   "author": "Harry Ho",
   "license": "MIT",
   "dependencies": {
+    "css-loader": "0.26.1",
+    "express": "4.16.4",
+    "extract-text-webpack-plugin": "1.0.1",
     "flexboxgrid": "6.3.1",
     "font-awesome": "4.7.0",
     "formsy-material-ui": "0.6.0",
@@ -42,7 +45,9 @@
     "react-tap-event-plugin": "2.0.1",
     "recharts": "0.20.8",
     "redux": "3.7.1",
-    "redux-thunk": "2.2.0"
+    "redux-thunk": "2.2.0",
+    "socket.io-client": "2.2.0",
+    "style-loader": "0.13.1"
   },
   "devDependencies": {
     "autoprefixer": "6.7.3",

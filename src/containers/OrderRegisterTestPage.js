@@ -1,5 +1,4 @@
 import React, { PropTypes } from "react";
-import { Link } from "react-router";
 import ShoppingCart from "material-ui/svg-icons/action/shopping-cart";
 import {
   pink600,
@@ -7,15 +6,14 @@ import {
   grey600,
   white
 } from "material-ui/styles/colors";
-// import Data from '../data';
 import { connect } from "react-redux";
 import { loadOrders, deleteOrder } from "../actions/order";
 import FlatButton from "material-ui/FlatButton";
 import { typography } from "material-ui/styles";
-import ChatbotBox from "../components/dashboard/ChatbotBox";
-import ChatbotActionBox from "../components/dashboard/ChatbotActionBox";
+import Chat from '../components/chat/Chat';
 
-class OrderDetailPage extends React.Component {
+
+class OrderRegisterTestPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -53,6 +51,9 @@ class OrderDetailPage extends React.Component {
   }
 
   componentWillMount() { }
+
+  componentDidMount() {
+  }
 
   /* eslint-disable */
   componentDidUpdate(prevProps, prevState) {
@@ -134,6 +135,7 @@ class OrderDetailPage extends React.Component {
   render() {
     const { errorMessage, orderList } = this.props;
 
+
     const styles = {
       fab: {
         // margin: 0,
@@ -214,59 +216,14 @@ class OrderDetailPage extends React.Component {
 
     return (
         <div>
-          <h3 style={styles.navigation}>Chatbots / {this.props.orderList[0].reference}</h3>
-          <div className="row">
-            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-4 m-b-15 ">
-              <ChatbotBox
-                Icon={ShoppingCart}
-                color={pink600}
-                title={this.props.orderList[0].reference}
-                value="Chatbot specialized in HR assistant"
-              />
-            </div>
-          </div>
-
-          <div className="row" style={{width: 518}}>
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-              <ChatbotActionBox
-                Icon="../assets/img/list-icon.png"
-                title={this.props.orderList[0].reference}
-                value="Tests list"
-              />
-            </div>
-
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-            <Link to={`${window.location.href}/register-test`}>
-              <ChatbotActionBox
-                Icon="../assets/img/chat-icon.png"
-                title={this.props.orderList[0].reference}
-                value="Register test"
-              />
-            </Link>
-            </div>
-
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-              <ChatbotActionBox
-                Icon="../assets/img/log-icon.png"
-                title={this.props.orderList[0].reference}
-                value="Logs"
-              />
-            </div>
-
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-              <ChatbotActionBox
-                Icon="../assets/img/git-icon.png"
-                title={this.props.orderList[0].reference}
-                value="Versioning"
-              />
-            </div>
-          </div>
+          <h3 style={styles.navigation}>Chatbots / {this.props.orderList[0].reference} / register test</h3>
+          <Chat/>
         </div>
     );
   }
 }
 
-OrderDetailPage.propTypes = {
+OrderRegisterTestPage.propTypes = {
   orderList: PropTypes.array,
   getAllOrders: PropTypes.func.isRequired,
   deleteOrder: PropTypes.func.isRequired,
@@ -302,4 +259,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderDetailPage);
+export default connect(mapStateToProps, mapDispatchToProps)(OrderRegisterTestPage);
