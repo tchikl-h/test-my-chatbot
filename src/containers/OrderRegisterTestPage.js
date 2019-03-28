@@ -1,7 +1,5 @@
 import React, { PropTypes } from "react";
-import ShoppingCart from "material-ui/svg-icons/action/shopping-cart";
 import {
-  pink600,
   grey500,
   grey600,
   white

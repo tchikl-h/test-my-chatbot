@@ -1,8 +1,6 @@
-import browserSync from 'browser-sync';
 import historyApiFallback from 'connect-history-api-fallback';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
 
 const bundler = webpack(config);
@@ -16,10 +14,6 @@ var server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 process.on('SIGTERM', shutDown);
 process.on('SIGINT', shutDown);
-
-// app.get('/test', function(req, res) {
-//   res.send('hello world');
-// });
 
 app.use(historyApiFallback());
 
@@ -58,7 +52,7 @@ var userCount = 0;
 
 io.on('connect', function(socket){
   
-  socket.on('user:request', function(msg) {
+  socket.on('user:request', () => {
     userCount++;
     socket.emit('user:accept', { id : userId, users : userCount });
     console.log("before userId : "+userId);

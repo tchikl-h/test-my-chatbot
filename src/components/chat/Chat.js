@@ -3,7 +3,7 @@ import MessageList from './MessageList';
 import MessageForm from './MessageForm';
 import './Chat.scss'
 
-var socket = require('socket.io-client')('http://localhost:3000');
+let socket = require('socket.io-client')('http://localhost:3000');
 
 export default class Chat extends React.Component {
 
@@ -38,36 +38,36 @@ export default class Chat extends React.Component {
     this.setState({ userid : msg.id });
     this.setState({ users : msg.users });
 
-    var newMessages = this.state.messages;
+    let newMessages = this.state.messages;
     newMessages.push( { 'type' : 'status', 'status' : 'you joined', 'count' : msg.users} );
     this.setState( {messages : newMessages} );
   }
 
   userJoin() {
-    this.setState((prevState, props) => ({ users: prevState.users + 1 }));
+    this.setState((prevState) => ({ users: prevState.users + 1 }));
 
-    var newMessages = this.state.messages;
+    let newMessages = this.state.messages;
     newMessages.push( { 'type' : 'status', 'status' : 'someone joined', 'count' : this.state.users} );
     this.setState( {messages : newMessages} );
   }
 
   userLeft() {
-    this.setState((prevState, props) => ({ users: prevState.users - 1 }));
+    this.setState((prevState) => ({ users: prevState.users - 1 }));
 
-    var newMessages = this.state.messages;
+    let newMessages = this.state.messages;
     newMessages.push( { 'type' : 'status', 'status' : 'someone left', 'count' : this.state.users} );
     this.setState( {messages : newMessages} );
   }
 
   messageReceive(msg) {
-    var newMessages = this.state.messages;
+    let newMessages = this.state.messages;
     newMessages.push(msg);
     this.setState( {messages : newMessages} );
     window.scrollTo(0, document.body.scrollHeight);
   }
 
   messageReceivedByBot(msg) {
-    var newMessages = this.state.messages;
+    let newMessages = this.state.messages;
     newMessages.push(msg);
     this.setState( {messages : newMessages} );
     window.scrollTo(0, document.body.scrollHeight);
