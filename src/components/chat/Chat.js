@@ -3,7 +3,7 @@ import MessageList from './MessageList';
 import MessageForm from './MessageForm';
 import './Chat.scss'
 
-let socket = require('socket.io-client')('http://localhost:3000');
+let socket = require('socket.io-client')('https://mobilier-restaurant-bretagne.com');
 
 export default class Chat extends React.Component {
 
