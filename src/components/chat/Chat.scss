@@ -64,9 +64,9 @@
 	margin: 0; padding: 0; box-sizing: border-box;
 	border: 20%;
 	padding: 10px;
-	width: 77%;
+	width: calc(calc(100% - 240px) -  10%);
 	margin: 0.5%;
-	margin-left: 13%;
+	margin-left: 240px;
 	font-size: 1.3em;
 	outline: none;
 	background-color: #eeeeee;
