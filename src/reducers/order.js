@@ -15,7 +15,7 @@ import {
   DELETE_ORDER_SUCCESS,
   DELETE_ORDER_FAILURE,
   NEW_ORDER_REQUEST
-} from "../constants";
+} from "../actions/actionTypes";
 
 export function orderReducer(
   state = {
@@ -40,6 +40,8 @@ export function orderReducer(
         filters: action.filters
       });
     case LOAD_ORDERS_SUCCESS:
+    console.log("LOAD_ORDERS_SUCCESS");
+    console.log(action);
       return Object.assign({}, state, {
         isFetching: false,
         orderList: JSON.parse(action.response).filter(e => {

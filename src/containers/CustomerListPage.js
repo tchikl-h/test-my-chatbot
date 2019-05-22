@@ -1,4 +1,4 @@
-import React, { PropTypes } from "react";
+import React from "react";
 import { Link } from "react-router";
 import {
   Table,
@@ -12,11 +12,7 @@ import FloatingActionButton from "material-ui/FloatingActionButton";
 import ContentCreate from "material-ui/svg-icons/content/create";
 import ActionDelete from "material-ui/svg-icons/action/delete";
 import ContentAdd from "material-ui/svg-icons/content/add";
-import Search from "material-ui/svg-icons/action/search";
-import CheckCircle from "material-ui/svg-icons/action/check-circle";
-import Cancel from "material-ui/svg-icons/navigation/cancel";
 import {
-  teal500,
   pink500,
   grey200,
   grey500,
@@ -24,16 +20,14 @@ import {
   white
 } from "material-ui/styles/colors";
 import PageBase from "../components/PageBase";
-// import Data from '../data';
 import Pagination from "../components/Pagination";
 import { connect } from "react-redux";
-import { loadCustomers, deleteCustomer } from "../actions/customer";
 import Dialog from "material-ui/Dialog";
 import FlatButton from "material-ui/FlatButton";
-import Drawer from "material-ui/Drawer";
-import RaisedButton from "material-ui/RaisedButton";
-import TextField from "material-ui/TextField";
-import Snackbar from "material-ui/Snackbar";
+import { getUsersByCompany, deleteUsers } from "../actions/usersActions";
+import { getUserFilteredList, getUserIsFetching, getUserFilteredById } from "../selectors/usersSelectors";
+import { getChatbotsByCompany } from "../actions/chatbotsActions";
+import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
 
 class CustomerListPage extends React.Component {
   constructor(props) {
@@ -41,47 +35,25 @@ class CustomerListPage extends React.Component {
 
     this.state = {
       open: false,
-      searchOpen: false,
-      snackbarOpen: false,
-      autoHideDuration: 1500,
-
-      fixedHeader: true,
-      fixedFooter: true,
-      stripedRows: false,
-      showRowHover: false,
-      selectable: false,
-      multiSelectable: false,
-      enableSelectAll: false,
-      deselectOnClickaway: true,
-      showCheckboxes: false,
       pageOfItems: [],
       customerId: null,
       dialogText: "Are you sure to do this?",
-      search: {
-        firstName: "",
-        lastName: ""
-      }
     };
 
     this.onChangePage = this.onChangePage.bind(this);
     this.onDelete = this.onDelete.bind(this);
-    this.handleToggle = this.handleToggle.bind(this);
-    this.handleSearchFilter = this.handleSearchFilter.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.handleErrorMessage = this.handleErrorMessage.bind(this);
-    this.handleSnackBarClose = this.handleSnackBarClose.bind(this);
-
-    if (this.props.customerList || this.props.customerList.length < 1)
-      props.getAllCustomers(this.state.search);
   }
 
-  componentWillMount() { }
+  componentDidMount() {
+    this.props.getUsersByCompany(localStorage.getItem("companyId"));
+    this.props.getChatbotsByCompany(localStorage.getItem("companyId"))
+  }
 
   /* eslint-disable */
   componentDidUpdate(prevProps, prevState) {
     // reset page if items array has changed
-    if (this.props.customerList !== prevProps.customerList) {
-      this.onChangePage(this.props.customerList.slice(0, 10));
+    if (this.props.userList !== prevProps.userList) {
+      this.onChangePage(this.props.userList.slice(0, 10));
     }
   }
 
@@ -89,7 +61,7 @@ class CustomerListPage extends React.Component {
     if (
       !this.props.isFetching &&
       this.state.pageOfItems &&
-      this.props.customerList
+      this.props.userList
     )
       this.setState({ pageOfItems: pageOfItems });
   }
@@ -98,15 +70,6 @@ class CustomerListPage extends React.Component {
     if (id) {
       this.handleOpen(id);
     }
-  }
-
-  handleToggle() {
-    this.setState({ searchOpen: !this.state.searchOpen });
-  }
-
-  handleSearch() {
-    this.setState({ searchOpen: !this.state.searchOpen });
-    this.props.getAllCustomers(this.state.search);
   }
 
   handleOpen(id) {
@@ -119,63 +82,15 @@ class CustomerListPage extends React.Component {
     this.setState({ open: false });
 
     if (isConfirmed && this.state.customerId) {
-      this.props.deleteCustomer(this.state.customerId);
+      this.props.deleteUsers(this.state.customerId)
+      .then(() => {
+        this.props.getUsersByCompany(localStorage.getItem("companyId"));
+      })
       this.setState({ customerId: null });
     }
   }
 
-  handleSearchFilter(event) {
-    const field = event.target.name;
-
-    if (event && event.target && field) {
-      const search = Object.assign({}, this.state.search);
-      search[field] = event.target.value;
-      this.setState({ search: search });
-    }
-  }
-
-  handleErrorMessage() {
-    this.setState({
-      snackbarOpen: true
-    });
-  }
-
-  handleSnackBarClose() {
-    this.setState({
-      snackbarOpen: false
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps && nextProps.errorMessage && !nextProps.deleteSuccess) {
-      this.setState({ snackbarOpen: true });
-    }
-
-    if (
-      !this.props.deleteSuccess &&
-      nextProps.deleteSuccess &&
-      !nextProps.errorMessage &&
-      !nextProps.isFetching
-    ) {
-      this.props.getAllCustomers();
-    }
-  }
-
   render() {
-    const {
-      errorMessage,
-      customerList,
-      deleteSuccess,
-      isFetching
-    } = this.props;
-
-    //  if ( deleteSuccess && !isFetching){
-    //        this.props.getAllCustomers();
-    //  }
-    //  else if (!deleteSuccess && errorMessage){
-    //    this.handleErrorMessage ();
-    //  }
-
     const styles = {
       fab: {
         // margin: 0,
@@ -185,16 +100,6 @@ class CustomerListPage extends React.Component {
         left: "auto",
         position: "fixed",
         marginRight: 20
-      },
-      fabSearch: {
-        // margin: 0,
-        top: "auto",
-        right: 100,
-        bottom: 20,
-        left: "auto",
-        position: "fixed",
-        marginRight: 20,
-        backgroundColor: "lightblue"
       },
       editButton: {
         paddingRight: 25
@@ -206,17 +111,14 @@ class CustomerListPage extends React.Component {
         fill: grey500
       },
       columns: {
-        id: {
-          width: "10%"
+        firstName: {
+          width: "20%"
         },
-        name: {
+        lastName: {
+          width: "20%"
+        },
+        chatbots: {
           width: "40%"
-        },
-        price: {
-          width: "20%"
-        },
-        category: {
-          width: "20%"
         },
         edit: {
           width: "20%"
@@ -226,8 +128,9 @@ class CustomerListPage extends React.Component {
         width: "20%",
         maxWidth: "none"
       },
-      drawer: {
-        backgroundColor: "lightgrey"
+      chatbotAvatar: {
+        marginLeft: "3px",
+        marginRight: "3px",
       }
     };
 
@@ -248,115 +151,111 @@ class CustomerListPage extends React.Component {
 
     return (
       <PageBase
-        title={"Customers (" + customerList.length + ")"}
-        navigation="React CRM / Customer"
+        title={"Members (" + this.props.userList.length + ")"}
+        navigation="Team"
       >
         <div>
           <div>
-            <Link to="/customer">
-              <FloatingActionButton
-                backgroundColor="lightblue"
-                secondary={true}
-                style={styles.fab}
-                backgroundColor={pink500}
-              >
-                <ContentAdd />
-              </FloatingActionButton>
-            </Link>
-
-            <FloatingActionButton
-              style={styles.fabSearch}
-              backgroundColor={teal500}
-              onTouchTap={this.handleToggle}
-            >
-              <Search />
-            </FloatingActionButton>
+            {
+              this.props.user.companyOwner === true &&
+              <Link to="/customer">
+                <FloatingActionButton
+                  backgroundColor="lightblue"
+                  secondary={true}
+                  style={styles.fab}
+                  backgroundColor={pink500}
+                >
+                  <ContentAdd />
+                </FloatingActionButton>
+              </Link>
+            }
           </div>
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-
-          <Snackbar
-            open={this.state.snackbarOpen}
-            message={errorMessage ? errorMessage : ""}
-            autoHideDuration={this.state.autoHideDuration}
-            onRequestClose={this.handleSnackBarClose}
-          />
 
           <Table
-            fixedHeader={this.state.fixedHeader}
-            fixedFooter={this.state.fixedFooter}
-            selectable={this.state.selectable}
-            multiSelectable={this.state.multiSelectable}
+            fixedHeader={true}
+            fixedFooter={true}
+            selectable={false}
+            multiSelectable={false}
           >
             <TableHeader
-              displaySelectAll={this.state.showCheckboxes}
-              adjustForCheckbox={this.state.showCheckboxes}
-              enableSelectAll={this.state.enableSelectAll}
+              displaySelectAll={false}
+              adjustForCheckbox={false}
+              enableSelectAll={false}
             >
               <TableRow>
-                <TableHeaderColumn style={styles.columns.name} />
-                <TableHeaderColumn style={styles.columns.name}>
+                <TableHeaderColumn style={styles.columns.firstName} />
+                <TableHeaderColumn style={styles.columns.firstName}>
                   First Name
                 </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.name}>
+                <TableHeaderColumn style={styles.columns.lastName}>
                   Last Name
                 </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.price}>
-                  Rewards
-                </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.category}>
-                  Membership
+                <TableHeaderColumn style={styles.columns.chatbots}>
+                  Chatbots
                 </TableHeaderColumn>
                 <TableHeaderColumn style={styles.columns.edit}>
-                  Edit
+                Edit
                 </TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody
-              displayRowCheckbox={this.state.showCheckboxes}
-              deselectOnClickaway={this.state.deselectOnClickaway}
-              showRowHover={this.state.showRowHover}
-              stripedRows={this.state.stripedRows}
+              displayRowCheckbox={false}
+              deselectOnClickaway={true}
+              showRowHover={false}
+              stripedRows={false}
             >
-              {this.state.pageOfItems.map(item => (
-                <TableRow key={item.id}>
-                  <TableRowColumn style={styles.columns.name}>
-                    <img width={40} src={item.avatar} />
+              {this.state.pageOfItems.map(user => (
+                <TableRow key={user.id}>
+                  <TableRowColumn style={styles.columns.firstName}>
+                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.lastName} />
                   </TableRowColumn>
-                  <TableRowColumn style={styles.columns.name}>
-                    {item.firstName}
+                  <TableRowColumn style={styles.columns.firstName}>
+                    {user.firstName}
                   </TableRowColumn>
-                  <TableRowColumn style={styles.columns.name}>
-                    {item.lastName}
+                  <TableRowColumn style={styles.columns.lastName}>
+                    {user.lastName}
                   </TableRowColumn>
-                  <TableRowColumn style={styles.columns.price}>
-                    {item.rewards}
+                  <TableRowColumn style={styles.columns.chatbots}>
+                  {
+                    this.props.chatbotList && this.props.chatbotList.map(chatbot => {
+                      if (user.chatbotIds.includes(chatbot.id)) {
+                        console.log(chatbot.project_name);
+                        return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/gridy/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
+                      }
+                    })
+                  }
                   </TableRowColumn>
-                  <TableRowColumn style={styles.columns.category}>
-                    {item.membership ? <CheckCircle /> : <Cancel />}
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.columns.edit}>
-                    <Link className="button" to={"/customer/" + item.id}>
-                      <FloatingActionButton
-                        zDepth={0}
-                        mini={true}
-                        style={styles.editButton}
-                        backgroundColor={green400}
-                        iconStyle={styles.editButtonIcon}
-                      >
-                        <ContentCreate />
-                      </FloatingActionButton>
-                    </Link>
+                      <TableRowColumn style={styles.columns.edit}>
+                      {
+                        (this.props.user.id === user.id || this.props.user.companyOwner === true) && (
+                            <Link to={"/customer/" + user.id}>
+                            <FloatingActionButton
+                              zDepth={0}
+                              mini={true}
+                              style={styles.editButton}
+                              backgroundColor={green400}
+                              iconStyle={styles.editButtonIcon}
+                            >
+                              <ContentCreate />
+                            </FloatingActionButton>
+                          </Link>
+                        )
+                      }
+                      {
+                        this.props.user.companyOwner === true && (
 
-                    <FloatingActionButton
-                      zDepth={0}
-                      mini={true}
-                      backgroundColor={grey200}
-                      iconStyle={styles.deleteButton}
-                      onTouchTap={() => this.onDelete(item.id)}
-                    >
-                      <ActionDelete />
-                    </FloatingActionButton>
-                  </TableRowColumn>
+                          <FloatingActionButton
+                            zDepth={0}
+                            mini={true}
+                            backgroundColor={grey200}
+                            iconStyle={styles.deleteButton}
+                            onTouchTap={() => this.onDelete(user.id)}
+                          >
+                            <ActionDelete />
+                          </FloatingActionButton>
+                        )
+                      }
+                      </TableRowColumn>
                 </TableRow>
               ))}
             </TableBody>
@@ -365,7 +264,7 @@ class CustomerListPage extends React.Component {
             <div className={"col-xs-6"}>
               <div className={"box"}>
                 <Pagination
-                  items={customerList}
+                  items={this.props.userList}
                   onChangePage={this.onChangePage}
                 />
               </div>
@@ -381,81 +280,19 @@ class CustomerListPage extends React.Component {
           >
             {this.state.dialogText}
           </Dialog>
-
-          <Drawer
-            width={300}
-            openSecondary={true}
-            open={this.state.searchOpen}
-            containerStyle={styles.drawer}
-          >
-            {/*<AppBar title="AppBar" />*/}
-            <RaisedButton
-              label="Search"
-              style={styles.saveButton}
-              type="button"
-              onClick={this.handleSearch}
-              secondary={true}
-            />
-
-            <TextField
-              hintText="First Name"
-              floatingLabelText="First Name"
-              name="firstName"
-              fullWidth={true}
-              value={this.state.search.firstName}
-              onChange={this.handleSearchFilter}
-            />
-
-            <TextField
-              hintText="Last Name"
-              floatingLabelText="Last Name"
-              fullWidth={true}
-              name="lastName"
-              value={this.state.search.lastName}
-              onChange={this.handleSearchFilter}
-            />
-          </Drawer>
         </div>
       </PageBase>
     );
   }
 }
 
-CustomerListPage.propTypes = {
-  isFetching: PropTypes.bool,
-  customerList: PropTypes.array,
-  getAllCustomers: PropTypes.func.isRequired,
-  deleteCustomer: PropTypes.func.isRequired,
-  deleteSuccess: PropTypes.bool.isRequired,
-  errorMessage: PropTypes.string
-};
-
 function mapStateToProps(state) {
-  const { customerReducer } = state;
-  const {
-    customerList,
-    isFetching,
-    deleteSuccess,
-    isAuthenticated,
-    errorMessage,
-    user
-  } = customerReducer;
-
   return {
-    customerList,
-    isFetching,
-    isAuthenticated,
-    errorMessage,
-    deleteSuccess,
-    user
+    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
+    userList: getUserFilteredList(state),
+    chatbotList: getChatbotFilteredList(state),
+    isFetching: getUserIsFetching(state),
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    getAllCustomers: filters => dispatch(loadCustomers(filters)),
-    deleteCustomer: id => dispatch(deleteCustomer(id))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CustomerListPage);
+export default connect(mapStateToProps, { getUsersByCompany, deleteUsers, getChatbotsByCompany })(CustomerListPage);

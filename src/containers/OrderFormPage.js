@@ -1,26 +1,16 @@
 import React, { PropTypes } from "react";
 import { Link } from "react-router";
 import RaisedButton from "material-ui/RaisedButton";
-// import MenuItem from 'material-ui/MenuItem';
-// import TextField from 'material-ui/TextField';
-// import SelectField from 'material-ui/SelectField';
-// import Toggle from 'material-ui/Toggle';
-// import DatePicker from 'material-ui/DatePicker';
-import Dialog from "material-ui/Dialog"; // , { DialogActions, DialogContent, DialogContentText, DialogTitle}
-import { grey400 } from "material-ui/styles/colors";
 import PageBase from "../components/PageBase";
 import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
-// import {Card} from 'material-ui/Card';
-import { getOrder, updateOrder, addOrder, newOrder } from "../actions/order";
-import { loadCustomers } from "../actions/customer";
-import { loadProducts, loadCategories } from "../actions/product";
 
-import { FormsyText, FormsySelect } from "formsy-material-ui/lib";
+import { FormsyText } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
-import MenuItem from "material-ui/MenuItem";
 import CircularProgress from "material-ui/CircularProgress";
 import autoBind from "react-autobind";
+import { getChatbotsByUser, postChatbots, patchChatbots } from "../actions/chatbotsActions";
+import { getChatbotFilteredById, getChatbotIsFetching } from "../selectors/chatbotsSelectors";
 
 class OrderFormPage extends React.Component {
   constructor(props) {
@@ -28,53 +18,19 @@ class OrderFormPage extends React.Component {
     autoBind(this);
     this.state = {
       isFetching: this.props.routeParams.id ? true : false, // fetching :id of the chatbot if exists
-      categoryId: 0,
-      product: null,
-      open: false,
-      order: {}
+      chatbot: {}
     };
   }
 
-  componentWillMount() {
-    // get existing chatbot
-    if (this.props.routeParams && this.props.routeParams.id) {
-      this.props.getOrder(this.props.routeParams.id);
-      this.props.getAllCustomers();
-      this.props.getCategoryList();
-    } else {
-      this.props.newOrder(); // create a new chatbot
-    }
+  componentDidMount() {
+    this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
   }
 
   componentWillReceiveProps(nextProps) {
     // detect if fetching of not
-    if (
-      (this.props.order &&
-        nextProps.order &&
-        this.props.order.id != nextProps.order.id) ||
-      this.props.order != nextProps.order
-    ) {
+    if (nextProps.chatbot && nextProps.chatbot.id) {
       this.setState({ isFetching: false });
-      this.setState({ order: Object.assign({}, nextProps.order) });
-    }
-
-    if (nextProps.productList) {
-      this.setState({ productList: Object.assign({}, nextProps.productList) });
-    }
-
-    if (
-      (!this.props.addSuccess && nextProps.addSuccess) ||
-      (!this.props.updateSuccess && nextProps.updateSuccess)
-    ) {
-      this.props.router.push("/orders");
-    }
-  }
-
-  disableButton() {
-    if (this.state.order.products <= 0) {
-      this.setState({
-        canSubmit: false
-      });
+      this.setState({ chatbot: Object.assign({}, nextProps.chatbot) });
     }
   }
 
@@ -82,14 +38,20 @@ class OrderFormPage extends React.Component {
     console.error("Form error:", data);
   }
 
-  handleClick(event, action) {
+  handleClick(event) {
     event.preventDefault();
-    console.log(event);
-    if (action && action === "AddProduct") {
-      this.setState({ open: true });
-    } else {
-      if (this.state.order.id) this.props.updateOrder(this.state.order);
-      else this.props.addOrder(this.state.order);
+    if (this.state.chatbot.id) {
+      this.props.patchChatbots(this.state.chatbot)
+      .then(() => {
+        this.props.router.push("/orders");
+      });
+    }
+    else {
+      this.props.postChatbots(this.state.chatbot)
+      .then(() => {
+        this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
+        this.props.router.push("/orders");
+      })
     }
   }
 
@@ -101,112 +63,36 @@ class OrderFormPage extends React.Component {
 
   handleChange(event, date) {
     const field = event ? event.target.name : null;
-    const { order } = this.state;
+    const { chatbot } = this.state;
 
-    if (order) {
+    if (chatbot) {
       if (typeof date === "object") {
-        let order = Object.assign({}, order);
-        order.shippedDate = date.toLocaleDateString();
-        this.setState({ order: order });
+        let chatbot = Object.assign({}, chatbot);
+        this.setState({ chatbot: chatbot });
         this.enableButton();
       } else if (event && event.target && field) {
-        let _order = Object.assign({}, order);
-        _order[field] = event.target.value;
-        this.setState({ order: _order });
+        let _chatbot = Object.assign({}, chatbot);
+        _chatbot[field] = event.target.value;
+        this.setState({ chatbot: _chatbot });
         this.enableButton();
       }
     }
   }
 
-  removeProduct(product) {
-    if (product) {
-      this.state.order.products.splice(
-        this.state.order.products.indexOf(product),
-        1
-      );
-      this.setState({ order: this.state.order });
-      if (this.state.order.products.length > 0) this.enableButton();
-    }
-  }
-
-  handleCancel() {
-    this.setState({ open: false });
-  }
-
-  handleOk() {
-    const { order } = this.state;
-
-    order.products = order.products || [];
-    order.products.push(this.state.product);
-    this.setState({ open: false });
-    this.setState({ order: this.state.order });
-    this.enableButton();
-  }
-
-  handleCategoryChange(event, index, values) {
-    this.props.getProductList({
-      categoryId: this.props.categoryList[values].id
-    });
-  }
-
-  handleProductChange(event, index, values) {
-    this.setState({ product: this.props.productList[values] });
-  }
-
   render() {
     const {
       errorMessage,
-      customerList,
-      categoryList,
-      productList
     } = this.props;
 
-    const { isFetching, order } = this.state;
+    const { isFetching, chatbot } = this.state;
 
     const styles = {
-      toggleDiv: {
-        maxWidth: 300,
-        marginTop: 0,
-        marginBottom: 5
-      },
-      toggleLabel: {
-        color: grey400,
-        fontWeight: 100
-      },
       buttons: {
         marginTop: 30,
         float: "right"
       },
       saveButton: {
         marginLeft: 5
-      },
-      card: {
-        width: 120
-      },
-      productList: {
-        color: "navy",
-        paddingTop: 20,
-        fontWeight: "bold"
-      },
-      productItem: {
-        background: "lightblue",
-        paddingLeft: 20
-      },
-      productDeleteIcon: {
-        float: "right",
-        marginTop: -30,
-        paddingRight: 20
-      },
-      menuItem: {
-        fontSize: 14
-      },
-      customWidth: {
-        width: 250
-      },
-      dialog: {
-        width: "20%",
-        maxWidth: "none",
-        minWidth: 300
       }
     };
 
@@ -217,12 +103,11 @@ class OrderFormPage extends React.Component {
         <PageBase title="Chatbot" navigation="Chatbots / creation">
           <Formsy.Form
             onValid={this.enableButton}
-            onInvalid={this.disableButton}
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cols={1} cellHeight={60}>
-              <GridTile>
+            <GridList cols={1} cellHeight={70}>
+              {/* <GridTile>
                 <FormsySelect
                   floatingLabelText="Owner"
                   value={order.customer ? order.customer.id : 0}
@@ -244,103 +129,138 @@ class OrderFormPage extends React.Component {
                     />
                   ))}
                 </FormsySelect>
-              </GridTile>
+              </GridTile> */}
 
               <GridTile>
                 <FormsyText
-                  hintText="Address"
+                  hintText="My awesome chatbot"
                   floatingLabelText="Name"
-                  name="shipAddress.address"
+                  name="project_name"
                   onChange={this.handleChange}
                   fullWidth={true}
                   value={
-                    order.shipAddress && order.shipAddress.address
-                      ? order.shipAddress.address
+                    chatbot.project_name
+                      ? chatbot.project_name
                       : ""
                   }
                   validations={{
                     isWords: true
                   }}
                   validationErrors={{
-                    isWords: "Please provide valid address",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  required
                 />
               </GridTile>
 
               <GridTile>
                 <FormsyText
-                  hintText="City"
+                  hintText="A great description"
                   floatingLabelText="Description"
-                  name="reference"
+                  name="description"
                   onChange={this.handleChange}
                   fullWidth={true}
                   value={
-                    order.shipAddress && order.shipAddress.city
-                      ? order.shipAddress.city
+                    chatbot.description
+                      ? chatbot.description
                       : ""
                   }
                   validations={{
                     isWords: true
                   }}
                   validationErrors={{
-                    isWords: "Please provide valid city",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  required
                 />
               </GridTile>
 
               <GridTile>
                 <FormsyText
-                  hintText="Country"
-                  floatingLabelText="Client access token"
-                  name="reference"
+                  hintText="Dialogflow, watson, fbDirect..."
+                  floatingLabelText="Container mode"
+                  name="container_mode"
                   onChange={this.handleChange}
                   fullWidth={true}
                   value={
-                    order.shipAddress && order.shipAddress.country
-                      ? order.shipAddress.country
+                    chatbot.container_mode
+                      ? chatbot.container_mode
                       : ""
                   }
                   validations={{
                     isWords: true
                   }}
                   validationErrors={{
-                    isWords: "Please provide valid country",
+                    isWords: "Please provide valid container mode",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  required
                 />
               </GridTile>
 
               <GridTile>
                 <FormsyText
-                  hintText="Zip Code"
-                  floatingLabelText="Developer access token"
-                  name="reference"
+                  hintText="567898765"
+                  floatingLabelText="Dialogflow project ID"
+                  name="dialogflow_project_id"
                   onChange={this.handleChange}
                   fullWidth={true}
                   value={
-                    order.shipAddress && order.shipAddress.zipcode
-                      ? order.shipAddress.zipcode
+                    chatbot.dialogflow_project_id
+                      ? chatbot.dialogflow_project_id
                       : ""
                   }
                   validations={{
                     isWords: true
                   }}
                   validationErrors={{
-                    isWords: "Please provide valid zip code",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  required
+                />
+              </GridTile>
+
+              <GridTile>
+                <FormsyText
+                  hintText="john@doe.com"
+                  floatingLabelText="Dialogflow client email"
+                  name="dialogflow_client_email"
+                  onChange={this.handleChange}
+                  fullWidth={true}
+                  value={
+                    chatbot.dialogflow_client_email
+                      ? chatbot.dialogflow_client_email
+                      : ""
+                  }
+                  validations={{
+                    isWords: true
+                  }}
+                  validationErrors={{
+                    isDefaultRequiredValue: "This is a required field"
+                  }}
+                />
+              </GridTile>
+
+              <GridTile>
+                <FormsyText
+                  hintText="5tuG2IUAG5sAlkay8tjG7"
+                  floatingLabelText="Dialogflow private key"
+                  name="dialogflow_private_key"
+                  onChange={this.handleChange}
+                  fullWidth={true}
+                  value={
+                    chatbot.dialogflow_private_key
+                      ? chatbot.dialogflow_private_key
+                      : ""
+                  }
+                  validations={{
+                    isWords: true
+                  }}
+                  validationErrors={{
+                    isDefaultRequiredValue: "This is a required field"
+                  }}
                 />
               </GridTile>
             </GridList>
 
             <div style={styles.buttons}>
-              <Link to="/orders">
+              <Link to={this.state.chatbot.id ? `/order/${this.state.chatbot.id}` : "/orders"}>
                 <RaisedButton label="Cancel" />
               </Link>
 
@@ -354,60 +274,6 @@ class OrderFormPage extends React.Component {
               />
             </div>
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-
-            <Dialog
-              title="Add Product"
-              open={this.state.open}
-              contentStyle={styles.dialog}
-              ignoreBackdropClick
-              ignoreEscapeKeyUp
-              maxWidth="xs"
-            >
-              <div>
-                <FormsySelect
-                  floatingLabelText="Categories"
-                  // onChange={this.handleChange}
-                  style={styles.customWidth}
-                  name="categoryId"
-                  onChange={this.handleCategoryChange}
-                >
-                  {categoryList.map((category, index) => (
-                    <MenuItem
-                      key={index}
-                      value={category.id}
-                      style={styles.menuItem}
-                      primaryText={category.categoryName}
-                    />
-                  ))}
-                </FormsySelect>
-
-                <FormsySelect
-                  floatingLabelText="Products"
-                  // onChange={this.handleChange}
-                  style={styles.customWidth}
-                  name="categoryId"
-                  onChange={this.handleProductChange}
-                >
-                  {productList.map((product, index) => (
-                    <MenuItem
-                      key={index}
-                      value={product.id}
-                      style={styles.menuItem}
-                      primaryText={product.productName}
-                    />
-                  ))}
-                </FormsySelect>
-
-                <span>
-                  <RaisedButton onClick={this.handleCancel} color="primary">
-                    Cancel
-                  </RaisedButton>
-                  <RaisedButton onClick={this.handleOk} color="primary">
-                    Ok
-                  </RaisedButton>
-                </span>
-              </div>
-            </Dialog>
           </Formsy.Form>
         </PageBase>
       );
@@ -418,58 +284,16 @@ class OrderFormPage extends React.Component {
 OrderFormPage.propTypes = {
   router: PropTypes.object,
   routeParams: PropTypes.object,
-  order: PropTypes.object,
-  newOrder: PropTypes.func.isRequired,
-  getOrder: PropTypes.func.isRequired,
-  updateOrder: PropTypes.func.isRequired,
-  getProductList: PropTypes.func.isRequired,
-  updateSuccess: PropTypes.bool.isRequired,
-  addSuccess: PropTypes.bool.isRequired,
-  addOrder: PropTypes.func.isRequired,
-  customerList: PropTypes.array,
-  categoryList: PropTypes.array,
-  productList: PropTypes.array,
-  getAllCustomers: PropTypes.func.isRequired,
-  getCategoryList: PropTypes.func.isRequired,
+  chatbot: PropTypes.array,
+  patchChatbots: PropTypes.func.isRequired,
   errorMessage: PropTypes.string
 };
 
-function mapStateToProps(state) {
-  const { customerReducer, orderReducer, productReducer } = state;
-  const { productList, categoryList } = productReducer;
-  const { customerList } = customerReducer;
-  const {
-    order,
-    isFetching,
-    updateSuccess,
-    addSuccess,
-    isAuthenticated,
-    user
-  } = orderReducer;
-
+function mapStateToProps(state, ownProps) {
   return {
-    order: order || {},
-    isFetching,
-    customerList,
-    categoryList,
-    productList,
-    addSuccess,
-    updateSuccess,
-    isAuthenticated,
-    user
+    chatbot: getChatbotFilteredById(state, ownProps.params.id) || {},
+    isFetching: getChatbotIsFetching(state),
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    newOrder: () => dispatch(newOrder()),
-    getOrder: id => dispatch(getOrder(id)),
-    updateOrder: order => dispatch(updateOrder(order)),
-    addOrder: order => dispatch(addOrder(order)),
-    getCategoryList: () => dispatch(loadCategories()),
-    getProductList: filters => dispatch(loadProducts(filters)),
-    getAllCustomers: () => dispatch(loadCustomers())
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(OrderFormPage);
+export default connect(mapStateToProps, { getChatbotsByUser, postChatbots, patchChatbots})(OrderFormPage);

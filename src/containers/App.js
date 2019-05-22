@@ -85,7 +85,7 @@ class App extends React.Component {
           {!isAuthenticated && (
             <LoginPage
               errorMessage={errorMessage}
-              onLoginClick={creds => dispatch(loginUser(creds))}
+              onLoginClick={(userId, companyId) => dispatch(loginUser(userId, companyId))}
             />
           )}
         </div>

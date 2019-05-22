@@ -1,9 +1,8 @@
 import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
-  // LOGIN_FAILURE,
   LOGOUT_SUCCESS
-} from "../constants";
+} from "../actions/actionTypes";
 
 // The auth reducer. The starting state sets authentication
 // based on a token being in local storage. In a real app,
@@ -12,8 +11,8 @@ export function auth(
   state = {
     isFetching: false,
     isAuthenticated: localStorage.getItem("token") ? true : false,
-    user: localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
+    userId: localStorage.getItem("userId")
+      ? JSON.parse(localStorage.getItem("userId"))
       : {}
   },
   action
@@ -23,23 +22,17 @@ export function auth(
       return Object.assign({}, state, {
         isFetching: true,
         isAuthenticated: false,
-        user: action.creds
+        userId: action.userId
       });
     case LOGIN_SUCCESS:
       return Object.assign({}, state, {
         isFetching: false,
         isAuthenticated: true,
         errorMessage: "",
-        user: localStorage.getItem("user")
-          ? JSON.parse(localStorage.getItem("user"))
+        userId: localStorage.getItem("userId")
+          ? JSON.parse(localStorage.getItem("userId"))
           : {}
       });
-    // case LOGIN_FAILURE:
-    //   return Object.assign({}, state, {
-    //     isFetching: false,
-    //     isAuthenticated: false,
-    //     errorMessage: action.message
-    //   });
     case LOGOUT_SUCCESS:
       return Object.assign({}, state, {
         isFetching: true,

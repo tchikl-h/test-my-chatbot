@@ -2,16 +2,16 @@ import React, { PropTypes } from "react";
 import Paper from "material-ui/Paper";
 import { white, grey800 } from "material-ui/styles/colors";
 import { typography } from "material-ui/styles";
-import ReactSVG from 'react-svg';
 import { Link } from "react-router";
 
 class ChatbotBox extends React.Component {
+
   render() {
-    const { color, title, value, Icon } = this.props;
+    const { color, title, value, userList, chatbot } = this.props;
 
     const styles = {
       paperSize: {
-        height: 120,
+        height: 150,
         width: 500
       },
       content: {
@@ -33,39 +33,58 @@ class ChatbotBox extends React.Component {
       },
       iconSpan: {
         float: "left",
-        height: 120,
-        width: 120,
+        height: 150,
+        width: 150,
         textAlign: "center",
         backgroundColor: color
       },
       editSpan: {
         float: "right",
         textAlign: "center",
+        padding: "5px 20px 0px 0px",
+      },
+      deleteSpan: {
+        float: "right",
+        textAlign: "center",
         padding: "5px 5px 0px 0px",
       },
       icon: {
-        height: 70,
-        width: 70,
-        marginTop: 20,
+        marginTop: 25,
+        height: 100,
+        width: 100,
         maxWidth: "100%"
+      },
+      avatar: {
+        marginLeft: "3px",
+        marginRight: "3px",
       }
     };
 
     return (
       <Paper style={styles.paperSize}>
         <span style={styles.iconSpan}>
-          <Icon color={white} style={styles.icon} />
+          <img style={styles.icon} src={`https://avatars.dicebear.com/v2/gridy/${title}.svg`} />
+        </span>
+
+        <span style={styles.deleteSpan}>
+          <img width={20} src={require("../../assets/img/delete.png")} onClick={() => this.props.openDeleteDialog()}/>
         </span>
 
         <span style={styles.editSpan}>
           <Link to={`${window.location.href}/edit`}>
-            <ReactSVG src="../assets/img/edit-icon.svg" svgStyle={{ width: 15, height: 15 }} />
+            <img width={15} src={require("../../assets/img/edit-icon.svg")} />
           </Link>
         </span>
 
         <div style={styles.content}>
           <span style={styles.text}>{title}</span>
           <span style={styles.number}>{value}</span>
+          {
+            userList.map(user => {
+              if (user.chatbotIds.includes(chatbot.id))
+                return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />)
+            })
+          }
         </div>
       </Paper>
     );
@@ -73,10 +92,11 @@ class ChatbotBox extends React.Component {
 }
 
 ChatbotBox.propTypes = {
-  Icon: PropTypes.any, // eslint-disable-line
   color: PropTypes.string,
   title: PropTypes.string,
-  value: PropTypes.string
+  value: PropTypes.string,
+  userList: PropTypes.array,
+  chatbot: PropTypes.object
 };
 
 export default ChatbotBox;

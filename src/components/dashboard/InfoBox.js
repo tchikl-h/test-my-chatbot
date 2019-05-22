@@ -5,7 +5,7 @@ import { typography } from "material-ui/styles";
 
 class InfoBox extends React.Component {
   render() {
-    const { color, title, value, Icon } = this.props;
+    const { color, title, value } = this.props;
 
     const styles = {
       content: {
@@ -15,13 +15,13 @@ class InfoBox extends React.Component {
       },
       number: {
         display: "block",
-        fontWeight: typography.fontWeightMedium,
+        fontWeight: typography.fontWeightLight,
         fontSize: 18,
         color: grey800
       },
       text: {
         fontSize: 20,
-        fontWeight: typography.fontWeightLight,
+        fontWeight: typography.fontWeightMedium,
         color: grey800
       },
       iconSpan: {
@@ -42,7 +42,7 @@ class InfoBox extends React.Component {
     return (
       <Paper>
         <span style={styles.iconSpan}>
-          <Icon color={white} style={styles.icon} />
+        <img style={styles.icon} src={`https://avatars.dicebear.com/v2/gridy/${title}.svg`} />
         </span>
 
         <div style={styles.content}>
@@ -57,7 +57,6 @@ class InfoBox extends React.Component {
 }
 
 InfoBox.propTypes = {
-  Icon: PropTypes.any, // eslint-disable-line
   color: PropTypes.string,
   title: PropTypes.string,
   value: PropTypes.string

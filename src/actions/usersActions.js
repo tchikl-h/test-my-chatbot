@@ -1,0 +1,192 @@
+import {
+  INVALIDATE_GET_USERS, REQUEST_GET_USERS, RECEIVE_GET_USERS,
+  INVALIDATE_GET_USERS_BY_COMPANY, REQUEST_GET_USERS_BY_COMPANY, RECEIVE_GET_USERS_BY_COMPANY,
+  INVALIDATE_POST_USERS, REQUEST_POST_USERS, RECEIVE_POST_USERS,
+  INVALIDATE_PATCH_USERS, REQUEST_PATCH_USERS, RECEIVE_PATCH_USERS,
+  INVALIDATE_DELETE_USERS, REQUEST_DELETE_USERS, RECEIVE_DELETE_USERS,
+} from "./actionTypes";
+import axios from "axios";
+
+export function requestGetUsers() {
+  return {
+    type: REQUEST_GET_USERS,
+  }
+}
+
+export function receiveGetUsers(users) {
+  return {
+    type: RECEIVE_GET_USERS,
+    users: users,
+    receivedAt: Date.now()
+  }
+}
+
+export function invalidateGetUsers() {
+  return {
+    type: INVALIDATE_GET_USERS,
+  }
+}
+
+export function requestGetUsersByCompany() {
+  return {
+    type: REQUEST_GET_USERS_BY_COMPANY,
+  }
+}
+
+export function receiveGetUsersByCompany(users) {
+  return {
+    type: RECEIVE_GET_USERS_BY_COMPANY,
+    usersFiltered: users,
+    receivedAt: Date.now()
+  }
+}
+
+export function invalidateGetUsersByCompany() {
+  return {
+    type: INVALIDATE_GET_USERS_BY_COMPANY,
+  }
+}
+
+export function requestPostUsers() {
+  return {
+    type: REQUEST_POST_USERS,
+  }
+}
+
+export function receivePostUsers() {
+  return {
+    type: RECEIVE_POST_USERS,
+  }
+}
+
+export function invalidatePostUsers() {
+  return {
+    type: INVALIDATE_POST_USERS,
+  }
+}
+
+export function requestPatchUsers() {
+  return {
+    type: REQUEST_PATCH_USERS,
+  }
+}
+
+export function receivePatchUsers() {
+  return {
+    type: RECEIVE_PATCH_USERS,
+  }
+}
+
+export function invalidatePatchUsers() {
+  return {
+    type: INVALIDATE_PATCH_USERS,
+  }
+}
+
+export function requestDeleteUsers() {
+  return {
+    type: REQUEST_DELETE_USERS,
+  }
+}
+
+export function receiveDeleteUsers() {
+  return {
+    type: RECEIVE_DELETE_USERS,
+  }
+}
+
+export function invalidateDeleteUsers() {
+  return {
+    type: INVALIDATE_DELETE_USERS,
+  }
+}
+
+export function getUsers() {
+  return function(dispatch) {
+    dispatch(requestGetUsers());
+    return axios.get('http://localhost:8080/v1/users')
+    .then((res) => {
+      if (res.status === 200)
+        dispatch(receiveGetUsers(res.data));
+      else
+        dispatch(invalidateGetUsers());
+    })
+  }
+}
+
+export function getUsersByCompany(id) {
+  return function(dispatch) {
+    dispatch(requestGetUsersByCompany());
+    return axios.get(`http://localhost:8080/v1/companies/${id}/users`)
+    .then((res) => {
+      if (res.status === 200)
+        dispatch(receiveGetUsersByCompany(res.data));
+      else
+        dispatch(invalidateGetUsersByCompany());
+    })
+  }
+}
+
+export const postUsers = user => (dispatch) =>
+  new Promise(function(resolve, reject) {
+    dispatch(requestPostUsers());
+    return axios({
+      method: 'post',
+      url: 'http://localhost:8080/v1/users',
+      data: {
+        name: user.name,
+        chatbotIds: user.chatbotIds,
+        companyId: user.companyId,
+      }
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receivePostUsers());
+        resolve();
+      }
+      else
+        dispatch(invalidatePostUsers());
+        reject();
+    })
+  });
+
+export const patchUsers = user => (dispatch) =>
+  new Promise(function(resolve, reject) {
+    dispatch(requestPatchUsers());
+    return axios({
+      method: 'patch',
+      url: `http://localhost:8080/v1/users/${user.id}`,
+      data: {
+        name: user.name,
+        chatbotIds: user.chatbotIds,
+        companyId: user.companyId,
+      }
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receivePatchUsers());
+        resolve();
+      }
+      else
+        dispatch(invalidatePatchUsers());
+        reject();
+    })
+  });
+
+export const deleteUsers = id => (dispatch) =>
+  new Promise(function(resolve, reject) {
+    dispatch(requestDeleteUsers());
+    return axios({
+      method: 'delete',
+      url: `http://localhost:8080/v1/users/${id}`
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveDeleteUsers());
+        resolve();
+      }
+      else
+        dispatch(invalidateDeleteUsers());
+        reject();
+    })
+  });

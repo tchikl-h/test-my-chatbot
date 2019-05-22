@@ -1,8 +1,6 @@
-import React, { PropTypes } from "react";
+import React from "react";
 import { Link } from "react-router";
 import RaisedButton from "material-ui/RaisedButton";
-import Toggle from "material-ui/Toggle";
-// import DatePicker from 'material-ui/DatePicker';
 import { grey400 } from "material-ui/styles/colors";
 import Divider from "material-ui/Divider";
 import PageBase from "../components/PageBase";
@@ -11,16 +9,13 @@ import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
 import { Card } from "material-ui/Card";
 import CircularProgress from "material-ui/CircularProgress";
-
-import {
-  getCustomer,
-  updateCustomer,
-  addCustomer,
-  newCustomer
-} from "../actions/customer";
-import { FormsyText } from "formsy-material-ui/lib";
+import { getUsers, postUsers, patchUsers } from "../actions/usersActions";
+import { getUserById, getUserIsFetching } from "../selectors/usersSelectors";
+import { FormsyText, FormsyCheckbox } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import autoBind from "react-autobind";
+import { getChatbotsByCompany } from "../actions/chatbotsActions";
+import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
 
 class CustomerFormPage extends React.Component {
   constructor(props) {
@@ -28,48 +23,29 @@ class CustomerFormPage extends React.Component {
     autoBind(this);
     this.state = {
       isFetching: this.props.routeParams.id ? true : false,
-      customer: {}
+      user: {}
     };
-
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleClick = this.handleClick.bind(this);
-    // this.enableButton = this.enableButton.bind(this);
-    // this.notifyFormError = this.notifyFormError.bind(this);
-    // this.disableButton = this.disableButton.bind(this);
   }
 
-  componentWillMount() {
-    if (this.props.routeParams.id)
-      this.props.getCustomer(this.props.routeParams.id);
-    else this.props.newCustomer();
+  componentDidMount() {
+    this.props.getUsers();
+    this.props.getChatbotsByCompany(localStorage.getItem("companyId"))
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      this.props.customer &&
-      nextProps.customer &&
-      this.props.customer.id != nextProps.customer.id
-    ) {
+    if (nextProps.user && nextProps.user.id) {
       this.setState({ isFetching: false });
-      this.setState({ customer: Object.assign({}, nextProps.customer) });
-    }
-
-    if (
-      (!this.props.addSuccess && nextProps.addSuccess) ||
-      (!this.props.updateSuccess && nextProps.updateSuccess)
-    ) {
-      this.props.router.push("/customers");
+      this.setState({ user: Object.assign({}, nextProps.user) });
     }
   }
 
   handleChange(event) {
     const field = event.target.name;
-    // const { customer } = this.state;
 
     if (event && event.target && field) {
-      const customer = Object.assign({}, this.state.customer);
-      customer[field] = event.target.value;
-      this.setState({ customer: customer });
+      const user = Object.assign({}, this.state.user);
+      user[field] = event.target.value;
+      this.setState({ user: user });
     }
   }
 
@@ -91,25 +67,36 @@ class CustomerFormPage extends React.Component {
 
   handleClick(event) {
     event.preventDefault();
-    if (this.state.customer.id) this.props.updateCustomer(this.state.customer);
-    else this.props.addCustomer(this.state.customer);
+    if (this.state.user.id) {
+      this.props.patchUsers(this.state.user)
+      .then(() => {
+        this.props.router.push("/customers");
+      })
+    }
+    else {
+      console.log(this.state.user);
+      this.props.postUsers(this.state.user)
+      .then(() => {
+        this.props.router.push("/customers");
+      })
+    }
+  }
+
+  onChangeChatbot(chatbotId) {
+    let user = Object.assign({}, this.state.user);
+    if (this.state.user && this.state.user.chatbotIds && this.state.user.chatbotIds.length > 0 && this.state.user.chatbotIds.includes(chatbotId))
+      user.chatbotIds = this.state.user.chatbotIds.filter(id => {return id != parseInt(chatbotId)});
+    else {
+      user.chatbotIds = this.state.user.chatbotIds;
+      user.chatbotIds.push(chatbotId);
+    }
+    this.setState({user: user})
   }
 
   render() {
-    const { errorMessage } = this.props;
-
-    const { isFetching, customer } = this.state;
+    const { isFetching, user } = this.state;
 
     const styles = {
-      toggleDiv: {
-        maxWidth: 300,
-        marginTop: 40,
-        marginBottom: 5
-      },
-      toggleLabel: {
-        color: grey400,
-        fontWeight: 100
-      },
       buttons: {
         marginTop: 30,
         float: "right"
@@ -125,7 +112,7 @@ class CustomerFormPage extends React.Component {
       return <CircularProgress />;
     } else {
       return (
-        <PageBase title="Customer" navigation="Application / Customer ">
+        <PageBase title="Customer" navigation={`Team / ${user.firstName} ${user.lastName}`}>
           <Formsy.Form
             onValid={this.enableButton}
             onInvalid={this.disableButton}
@@ -140,7 +127,7 @@ class CustomerFormPage extends React.Component {
                   name="firstName"
                   onChange={this.handleChange}
                   fullWidth={true}
-                  value={customer.firstName ? customer.firstName : ""}
+                  value={user.firstName ? user.firstName : ""}
                   validations={{
                     isWords: true
                   }}
@@ -148,7 +135,6 @@ class CustomerFormPage extends React.Component {
                     isWords: "Please provide valid first name",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  required
                 />
 
                 <FormsyText
@@ -164,44 +150,29 @@ class CustomerFormPage extends React.Component {
                     isWords: "Please provide valid first name",
                     isDefaultRequiredValue: "This is a required field"
                   }}
-                  value={customer.lastName ? customer.lastName : ""}
-                  required
+                  value={user.lastName ? user.lastName : ""}
                 />
 
-                <FormsyText
-                  hintText="Rewards"
-                  floatingLabelText="Rewards"
-                  fullWidth={true}
-                  type="number"
-                  name="rewards"
-                  onChange={this.handleChange}
-                  value={customer.rewards}
-                  validations={{
-                    isInt: true
-                  }}
-                  validationErrors={{
-                    isInt: "Please provide a valid password",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-
-                <div style={styles.toggleDiv}>
-                  <Toggle
-                    label="Membership"
-                    name="membership"
-                    onChange={this.handleChange}
-                    defaultToggled={customer.membership}
-                    labelStyle={styles.toggleLabel}
+                {
+                  this.props.chatbotList.map(chatbot => (
+                    <FormsyCheckbox
+                    label={chatbot.project_name}
+                    onChange={() => this.onChangeChatbot(chatbot.id)}
+                    name="chatbotIds" // TODO: to change
+                    defaultChecked={user.chatbotIds.includes(chatbot.id)}
+                    validationErrors={{
+                      isDefaultRequiredValue: "This is a required field"
+                    }}
                   />
-                </div>
+                  ))
+                }
               </GridTile>
 
               <GridTile>
-                {this.state.customer &&
-                  customer.avatar && (
+                {user &&
+                  user.avatar && (
                     <Card style={styles.card}>
-                      <img width={100} src={customer.avatar} />
+                      <img width={100} src={user.avatar} />
                     </Card>
                   )}
               </GridTile>
@@ -222,7 +193,6 @@ class CustomerFormPage extends React.Component {
                 disabled={!this.state.canSubmit}
               />
             </div>
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           </Formsy.Form>
         </PageBase>
       );
@@ -230,49 +200,12 @@ class CustomerFormPage extends React.Component {
   }
 }
 
-CustomerFormPage.propTypes = {
-  router: PropTypes.object,
-  routeParams: PropTypes.object,
-  customer: PropTypes.object,
-  newCustomer: PropTypes.func.isRequired,
-  getCustomer: PropTypes.func.isRequired,
-  updateCustomer: PropTypes.func.isRequired,
-  updateSuccess: PropTypes.bool.isRequired,
-  addSuccess: PropTypes.bool.isRequired,
-  addCustomer: PropTypes.func.isRequired,
-  errorMessage: PropTypes.string
-};
-
-function mapStateToProps(state) {
-  const { customerReducer } = state;
-  const {
-    customer,
-    isFetching,
-    updateSuccess,
-    addSuccess,
-    errorMessage,
-    isAuthenticated,
-    user
-  } = customerReducer;
-
+function mapStateToProps(state, ownProps) {
   return {
-    customer: customer || {},
-    isFetching,
-    addSuccess,
-    updateSuccess,
-    errorMessage,
-    isAuthenticated,
-    user
+    user: getUserById(state, ownProps.params.id) || {},
+    isFetching: getUserIsFetching(state),
+    chatbotList: getChatbotFilteredList(state),
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    newCustomer: () => dispatch(newCustomer()),
-    getCustomer: id => dispatch(getCustomer(id)),
-    updateCustomer: customer => dispatch(updateCustomer(customer)),
-    addCustomer: customer => dispatch(addCustomer(customer))
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CustomerFormPage);
+export default connect(mapStateToProps, { getUsers, postUsers, patchUsers, getChatbotsByCompany})(CustomerFormPage);

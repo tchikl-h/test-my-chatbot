@@ -1,5 +1,5 @@
 /* eslint-disable import/default */
-
+import 'babel-polyfill';
 import React from "react";
 import { render } from "react-dom";
 import { Provider } from "react-redux";
@@ -15,13 +15,14 @@ import "font-awesome/css/font-awesome.css";
 import "flexboxgrid/css/flexboxgrid.css";
 
 import thunkMiddleware from "redux-thunk";
-import api from "./middleware/api";
+import { createLogger } from 'redux-logger'
 
 import reducers from "./reducers";
+const loggerMiddleware = createLogger()
 
 injectTapEventPlugin();
 
-const createStoreWithMiddleware = applyMiddleware(thunkMiddleware, api)(
+const createStoreWithMiddleware = applyMiddleware(thunkMiddleware, loggerMiddleware)(
   createStore
 );
 

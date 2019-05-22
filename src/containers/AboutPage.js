@@ -1,39 +1,29 @@
 import React from "react";
+import { typography } from "material-ui/styles";
+import {
+  grey600
+} from "material-ui/styles/colors";
 
 class AboutPage extends React.Component {
 
   render() {
     const styles = {
-      about: {
-        display: "grid",
-        justifyContent: "center",
-      },
-      title: {
-        paddingTop: "50px",
-        paddingBottom: "30px",
-        textAlign: "center",
-        fontSize: "36px"
-      },
-      version: {
-        display: "flex",
-        justifyContent: "center",
-        fontSize: "24px",
-        color: "darkcyan",
+      navigation: {
+        fontSize: 15,
+        fontWeight: typography.fontWeightLight,
+        color: grey600,
+        paddingBottom: 15,
+        display: "block"
       },
       desc: {
-        padding: "0px 50px",
         fontSize: "20px"
       }
-    }
+    };
     return (
-      <div style={styles.about}>
-        <div style={styles.title}><b>About</b></div>
-
-        <div style={styles.version}>React CRM App Demo</div>
-
+      <div>
+        <h3 style={styles.navigation}>About us</h3>
         <div style={styles.desc}>
-          <p>This demo app is not a real application. There is no fake API as back-end service behind the scene. The advanced search in the demo doesn't work properly. Any data update (create or update record) will not be stored after hard refresh or logout. The main purpose of this demo is just a proof of concept.
-           </p>
+          <p>We are delighted to welcome you to our beta of Test my chatbot !</p>
         </div>
       </div>
     );

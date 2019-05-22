@@ -18,7 +18,7 @@ import {
   DELETE_PRODUCT_SUCCESS,
   DELETE_PRODUCT_FAILURE,
   NEW_PRODUCT_REQUEST
-} from "../constants";
+} from "../actions/actionTypes";
 
 export function productReducer(
   state = {

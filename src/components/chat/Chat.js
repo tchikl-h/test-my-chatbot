@@ -3,7 +3,7 @@ import MessageList from './MessageList';
 import MessageForm from './MessageForm';
 import './Chat.scss'
 
-let socket = require('socket.io-client')('https://mobilier-restaurant-bretagne.com');
+let socket = require('socket.io-client')('http://localhost:3000');
 
 export default class Chat extends React.Component {
 
@@ -60,6 +60,8 @@ export default class Chat extends React.Component {
   }
 
   messageReceive(msg) {
+    console.log("messageReceive");
+    console.log(msg);
     let newMessages = this.state.messages;
     newMessages.push(msg);
     this.setState( {messages : newMessages} );
@@ -75,6 +77,8 @@ export default class Chat extends React.Component {
 
   messageSend(message) {
     message.user = this.state.userid;
+    console.log("messageSend");
+    console.log(message);
     // 0) send user
     socket.emit('send:message', message);
   }

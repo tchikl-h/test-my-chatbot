@@ -6,9 +6,12 @@ import { grey500, white } from "material-ui/styles/colors";
 // import Card, { CardHeader, CardMedia, CardContent, CardActions } from "material-ui/Card";
 import { Link } from "react-router";
 import ThemeDefault from "../theme-default";
-
 import { FormsyText } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
+import { connect } from "react-redux";
+import { getUsers } from "../actions/usersActions";
+import { getUserList, getUserIsFetching } from "../selectors/usersSelectors";
+import bcrypt from 'bcryptjs';
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -16,7 +19,7 @@ class LoginPage extends React.Component {
 
     this.state = {
       canSubmit: false,
-      username: "herve.tchikladze@epitech.eu",
+      username: "dproost",
       password: "guest123",
       formError: "",
       errorMessage: props.errorMessage,
@@ -41,16 +44,24 @@ class LoginPage extends React.Component {
     this.disableButton = this.disableButton.bind(this);
   }
 
+  componentDidMount() {
+    this.props.getUsers();
+  }
+
   handleClick(event) {
     event.preventDefault();
-    const username = this.refs.username;
-    const password = this.refs.password;
-
-    const creds = {
-      username: username.getValue().trim(),
-      password: password.getValue().trim()
-    };
-    this.props.onLoginClick(creds);
+    const username = this.refs.username.state.value;
+    const password = this.refs.password.state.value;
+    const user = this.props.userList.find((user) => {return user.userName === username})
+    if (!user) {
+      this.setState({errorMessage: "Username or password is invalid"})
+      return;
+    }
+    const connectionResult = bcrypt.compareSync(password, user.password);
+    if (connectionResult)
+      this.props.onLoginClick(user.id, user.companyId);
+    else
+      this.setState({errorMessage: "Username or password is invalid"})
   }
 
   handleChange(e) {
@@ -149,8 +160,6 @@ class LoginPage extends React.Component {
       }
     };
 
-    const { errorMessage } = this.props;
-
     return (
       <MuiThemeProvider muiTheme={ThemeDefault}>
         <div>
@@ -165,17 +174,12 @@ class LoginPage extends React.Component {
                 onInvalidSubmit={this.notifyFormError}
               >
                 <FormsyText
-                  hintText="E-mail"
                   ref="username"
                   name="username"
                   value={this.state.username ? this.state.username : ""}
-                  floatingLabelText="E-mail"
+                  floatingLabelText="Username"
                   fullWidth={true}
-                  validations={{
-                    isEmail: true
-                  }}
                   validationErrors={{
-                    isEmail: "Please provide a valid email",
                     isDefaultRequiredValue: "This is a required field"
                   }}
                   required
@@ -208,10 +212,19 @@ class LoginPage extends React.Component {
                       disabled={!this.state.canSubmit}
                     />
                   </Link>
+                  <Link to="/">
+                    <RaisedButton
+                      label="Sign in"
+                      primary={true}
+                      onClick={() => this.handleClick(event)}
+                      style={styles.loginBtn}
+                      disabled={!this.state.canSubmit}
+                    />
+                  </Link>
                 </div>
                 <div>
-                  {errorMessage && (
-                    <p style={{ color: "red" }}>{errorMessage}</p>
+                  {this.state.errorMessage && (
+                    <p style={{ color: "red" }}>{this.state.errorMessage}</p>
                   )}
                 </div>
               </Formsy.Form>
@@ -225,7 +238,14 @@ class LoginPage extends React.Component {
 
 LoginPage.propTypes = {
   onLoginClick: PropTypes.func.isRequired,
-  errorMessage: PropTypes.string
 };
 
-export default LoginPage;
+
+function mapStateToProps(state) {
+  return {
+    userList: getUserList(state),
+    isFetching: getUserIsFetching(state),
+  };
+}
+
+export default connect(mapStateToProps, { getUsers })(LoginPage);

@@ -15,7 +15,7 @@ import {
   DELETE_CUSTOMER_SUCCESS,
   DELETE_CUSTOMER_FAILURE,
   NEW_CUSTOMER_REQUEST
-} from "../constants";
+} from "../actions/actionTypes";
 
 export function customerReducer(
   state = {
