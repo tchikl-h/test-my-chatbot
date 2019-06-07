@@ -15,7 +15,7 @@ import { getChatbotsByUser } from "../actions/chatbotsActions"
 import { getUsersByCompany } from "../actions/usersActions";
 import { getUserFilteredById } from "../selectors/usersSelectors";
 
-class OrderListPage extends React.Component {
+class ChatbotListPage extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -51,7 +51,7 @@ class OrderListPage extends React.Component {
           <h3 style={styles.navigation}>Chatbots</h3>
           {
             this.props.user.companyOwner === true &&
-            <Link to="/order">
+            <Link to="/chatbot">
               <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
                 <ContentAdd />
               </FloatingActionButton>
@@ -62,7 +62,7 @@ class OrderListPage extends React.Component {
             this.props.chatbotList.map(item => (
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-4 m-b-15 ">
                 
-                  <Link to={`/order/${item.id}`}>
+                  <Link to={`/chatbot/${item.id}`}>
                     <InfoBox
                       color={grey200}
                       title={item.project_name}
@@ -84,4 +84,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { getUsersByCompany, getChatbotsByUser })(OrderListPage);
+export default connect(mapStateToProps, { getUsersByCompany, getChatbotsByUser })(ChatbotListPage);

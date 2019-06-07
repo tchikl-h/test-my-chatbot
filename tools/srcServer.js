@@ -2,6 +2,8 @@ import historyApiFallback from 'connect-history-api-fallback';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import config from '../webpack.config.dev';
+import { exec } from 'child_process';
+var url = require('url');
 
 const bundler = webpack(config);
 
@@ -39,50 +41,48 @@ server.listen(port, '0.0.0.0', function onStart(err) {
     console.log(err);
   }
   console.info('==> Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
+  console.info('-Launching all the containers-');
+  exec(`docker start $(docker ps -aq)`, (err, stdout, stderr) => {
+    if (err)
+      console.log(err);
+    else
+      console.log("Docker container successfully launched !")
+  });
 });
 
 function shutDown() {
-  console.log('Received kill signal, shutting down gracefully');
-  io.emit('disconnect');
+  console.log("srcServer");
+  // console.log('Received kill signal, shutting down gracefully');
+  // io.emit('disconnect');
   process.exit(0);
 }
 
-var userId = 1;
-var userCount = 0;
-
-io.on('connect', function(socket){
-  
-  socket.on('user:request', () => {
-    userCount++;
-    socket.emit('user:accept', { id : userId, users : userCount });
-    console.log("before userId : "+userId);
-    userId++;
-    console.log("after userId : "+userId);
-    socket.broadcast.emit('user:join');
-    console.log("someone joined");
+io.sockets.on('connection', function(socket) {
+  console.log("Server : on.connection");
+  socket.on('room', function(room) {
+    console.log("Server : on.room "+room);
+      socket.join(room, () => {
+        console.log("Server : joined room "+room);
+        // 1) receive bot
+        socket.in(room).on('send:message:bot', function(data) {
+          console.log("Server : on.send:message:bot on room "+room);
+          // 2) send bot
+          io.sockets.in(room).emit('send:message:bot', {
+            msg: data.msg
+          });
+          console.log(" => " + data.msg.text);
+        });
+      
+        // 1) receive user
+        socket.in(room).on('send:message:user', function(data) {
+          console.log("Server : on.send:message:user on room "+room);
+          // 2) send user
+          io.sockets.in(room).emit('send:message:user', {
+            msg: data.msg
+          });
+          console.log(" => " + data.msg.text);
+          // TODO : add else "oups could not make chatbot connection"
+        });
+      });
   });
-
-  // 1) receive bot
-  socket.on('send:message:bot', function(msg) {
-    // 2) send bot
-    io.emit('send:message:bot', msg);
-    console.log(" => " + msg.text);
-  });
-
-  // 1) receive user
-  socket.on('send:message', function(msg) {
-    // 2) send user
-    io.emit('send:message', msg);
-    console.log(" => " + msg.text);
-  });
-
-  socket.on('disconnect', function(msg) {
-    socket.broadcast.emit('user:left', msg);
-    userCount--;
-    console.log("before userId : "+userId);
-    if (userId > 0)
-      userId--;
-    console.log("after userId : "+userId);
-    console.log("someone left");
-  })
 });

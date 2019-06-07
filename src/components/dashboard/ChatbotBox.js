@@ -7,12 +7,17 @@ import { Link } from "react-router";
 class ChatbotBox extends React.Component {
 
   render() {
-    const { color, title, value, userList, chatbot } = this.props;
+    const { color, title, value, userList, chatbot, user } = this.props;
+
+    const usersForChatbot = userList.filter(user => {
+      if (user.chatbotIds.includes(chatbot.id))
+        return user;
+    })
 
     const styles = {
       paperSize: {
         height: 150,
-        width: 500
+        width: usersForChatbot.length > 6 ? 500 + (usersForChatbot.length - 6) * 46 : 500
       },
       content: {
         padding: "35px 50px",
@@ -47,6 +52,7 @@ class ChatbotBox extends React.Component {
         float: "right",
         textAlign: "center",
         padding: "5px 5px 0px 0px",
+        cursor: "pointer"
       },
       icon: {
         marginTop: 25,
@@ -59,6 +65,7 @@ class ChatbotBox extends React.Component {
         marginRight: "3px",
       }
     };
+    console.log(userList);
 
     return (
       <Paper style={styles.paperSize}>
@@ -66,23 +73,28 @@ class ChatbotBox extends React.Component {
           <img style={styles.icon} src={`https://avatars.dicebear.com/v2/gridy/${title}.svg`} />
         </span>
 
-        <span style={styles.deleteSpan}>
-          <img width={20} src={require("../../assets/img/delete.png")} onClick={() => this.props.openDeleteDialog()}/>
-        </span>
+        {
+          user.companyOwner === true && (
+          <div>
+            <span style={styles.deleteSpan}>
+              <img width={20} src={require("../../assets/img/delete.png")} onClick={() => this.props.openDeleteDialog()}/>
+            </span>
 
-        <span style={styles.editSpan}>
-          <Link to={`${window.location.href}/edit`}>
-            <img width={15} src={require("../../assets/img/edit-icon.svg")} />
-          </Link>
-        </span>
+            <span style={styles.editSpan}>
+              <Link to={`${window.location.href}/edit`}>
+                <img width={15} src={require("../../assets/img/edit-icon.svg")} />
+              </Link>
+            </span>
+          </div>
+          )
+        }
 
         <div style={styles.content}>
           <span style={styles.text}>{title}</span>
           <span style={styles.number}>{value}</span>
           {
-            userList.map(user => {
-              if (user.chatbotIds.includes(chatbot.id))
-                return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />)
+            usersForChatbot.map(user => {
+              return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />)
             })
           }
         </div>
@@ -96,7 +108,8 @@ ChatbotBox.propTypes = {
   title: PropTypes.string,
   value: PropTypes.string,
   userList: PropTypes.array,
-  chatbot: PropTypes.object
+  chatbot: PropTypes.object,
+  user: PropTypes.object
 };
 
 export default ChatbotBox;

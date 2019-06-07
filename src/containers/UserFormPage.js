@@ -9,26 +9,34 @@ import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
 import { Card } from "material-ui/Card";
 import CircularProgress from "material-ui/CircularProgress";
-import { getUsers, postUsers, patchUsers } from "../actions/usersActions";
-import { getUserById, getUserIsFetching } from "../selectors/usersSelectors";
+import { postUsers, patchUsers, getUsersByCompany } from "../actions/usersActions";
+import { getUserIsFetching, getUserFilteredById } from "../selectors/usersSelectors";
 import { FormsyText, FormsyCheckbox } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import autoBind from "react-autobind";
 import { getChatbotsByCompany } from "../actions/chatbotsActions";
 import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
 
-class CustomerFormPage extends React.Component {
+class UserFormPage extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
     this.state = {
       isFetching: this.props.routeParams.id ? true : false,
-      user: {}
+      user: {
+        firstName: "",
+        lastName: "",
+        userName: "",
+        password: "",
+        chatbotIds: [],
+        companyOwner: false,
+        companyId: localStorage.getItem("companyId")
+      }
     };
   }
 
   componentDidMount() {
-    this.props.getUsers();
+    this.props.getUsersByCompany(localStorage.getItem("companyId"));
     this.props.getChatbotsByCompany(localStorage.getItem("companyId"))
   }
 
@@ -70,26 +78,30 @@ class CustomerFormPage extends React.Component {
     if (this.state.user.id) {
       this.props.patchUsers(this.state.user)
       .then(() => {
-        this.props.router.push("/customers");
+        this.props.router.push("/users");
       })
     }
     else {
       console.log(this.state.user);
       this.props.postUsers(this.state.user)
       .then(() => {
-        this.props.router.push("/customers");
+        this.props.router.push("/users");
       })
     }
   }
 
   onChangeChatbot(chatbotId) {
     let user = Object.assign({}, this.state.user);
-    if (this.state.user && this.state.user.chatbotIds && this.state.user.chatbotIds.length > 0 && this.state.user.chatbotIds.includes(chatbotId))
-      user.chatbotIds = this.state.user.chatbotIds.filter(id => {return id != parseInt(chatbotId)});
-    else {
-      user.chatbotIds = this.state.user.chatbotIds;
-      user.chatbotIds.push(chatbotId);
+    if (this.state.user && this.state.user.chatbotIds) {
+      if (this.state.user.chatbotIds.length > 0 && this.state.user.chatbotIds.includes(chatbotId))
+        user.chatbotIds = this.state.user.chatbotIds.filter(id => {return id != parseInt(chatbotId)});
+      else {
+        user.chatbotIds = this.state.user.chatbotIds;
+        user.chatbotIds.push(chatbotId);
+      }
     }
+    console.log("onChangeChatbot, dealing with: "+chatbotId);
+    console.log(user);
     this.setState({user: user})
   }
 
@@ -112,14 +124,14 @@ class CustomerFormPage extends React.Component {
       return <CircularProgress />;
     } else {
       return (
-        <PageBase title="Customer" navigation={`Team / ${user.firstName} ${user.lastName}`}>
+        <PageBase title="User" navigation={`Team / ${user.firstName} ${user.lastName}`}>
           <Formsy.Form
             onValid={this.enableButton}
             onInvalid={this.disableButton}
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cellHeight={300}>
+            <GridList cellHeight={this.props.user.id ? 300 : 450}>
               <GridTile>
                 <FormsyText
                   hintText="First Name"
@@ -152,14 +164,43 @@ class CustomerFormPage extends React.Component {
                   }}
                   value={user.lastName ? user.lastName : ""}
                 />
+                {
+                  !this.props.user.id && (
+                  <div>
+                    <FormsyText
+                      hintText="Username"
+                      floatingLabelText="username"
+                      fullWidth={true}
+                      name="userName"
+                      onChange={this.handleChange}
+                      validationErrors={{
+                        isDefaultRequiredValue: "This is a required field"
+                      }}
+                      value={user.userName ? user.userName : ""}
+                    />
 
+                    <FormsyText
+                      hintText="Password"
+                      floatingLabelText="Password"
+                      fullWidth={true}
+                      name="password"
+                      type="password"
+                      onChange={this.handleChange}
+                      validationErrors={{
+                        isDefaultRequiredValue: "This is a required field"
+                      }}
+                      value={user.password ? user.password : ""}
+                    />
+                  </div>
+                  )
+                }
                 {
                   this.props.chatbotList.map(chatbot => (
                     <FormsyCheckbox
                     label={chatbot.project_name}
                     onChange={() => this.onChangeChatbot(chatbot.id)}
                     name="chatbotIds" // TODO: to change
-                    defaultChecked={user.chatbotIds.includes(chatbot.id)}
+                    defaultChecked={user.id ? user.chatbotIds.includes(chatbot.id) : false}
                     validationErrors={{
                       isDefaultRequiredValue: "This is a required field"
                     }}
@@ -180,7 +221,7 @@ class CustomerFormPage extends React.Component {
             <Divider />
 
             <div style={styles.buttons}>
-              <Link to="/customers">
+              <Link to="/users">
                 <RaisedButton label="Cancel" />
               </Link>
 
@@ -202,10 +243,10 @@ class CustomerFormPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
   return {
-    user: getUserById(state, ownProps.params.id) || {},
+    user: getUserFilteredById(state, ownProps.params.id) || {},
     isFetching: getUserIsFetching(state),
     chatbotList: getChatbotFilteredList(state),
   };
 }
 
-export default connect(mapStateToProps, { getUsers, postUsers, patchUsers, getChatbotsByCompany})(CustomerFormPage);
+export default connect(mapStateToProps, { getUsersByCompany, postUsers, patchUsers, getChatbotsByCompany})(UserFormPage);

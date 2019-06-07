@@ -2,36 +2,33 @@ import React from "react";
 import { Route, IndexRoute } from "react-router";
 import App from "./containers/App";
 import NotFoundPage from "./containers/NotFoundPage.js";
-import FormPage from "./containers/FormPage";
 import Dashboard from "./containers/DashboardPage";
 import AboutPage from "./containers/AboutPage";
-import CustomerListPage from "./containers/CustomerListPage";
-import CustomerFormPage from "./containers/CustomerFormPage";
+import UserListPage from "./containers/UserListPage";
+import UserFormPage from "./containers/UserFormPage";
 
-import OrderListPage from "./containers/OrderListPage";
-import OrderFormPage from "./containers/OrderFormPage";
-import OrderDetailPage from "./containers/OrderDetailPage";
-import OrderRegisterTestPage from "./containers/OrderRegisterTestPage";
-import ProductFormPage from "./containers/ProductFormPage";
-import ProductListPage from "./containers/ProductListPage";
+import ChatbotListPage from "./containers/ChatbotListPage";
+import ChatbotFormPage from "./containers/ChatbotFormPage";
+import ChatbotDetailPage from "./containers/ChatbotDetailPage";
+import ChatbotRegisterTestPage from "./containers/ChatbotRegisterTestPage";
+import TestListPage from "./containers/TestListPage";
+import HistoryListPage from "./containers/HistoryListPage";
 
 export default (
   <Route>
     <Route path="/" component={App}>
       <IndexRoute component={Dashboard} />
       <Route path="dashboard" component={Dashboard} />
-      <Route path="form" component={FormPage} />
-      <Route path="customer" component={CustomerFormPage} />
-      <Route path="customer/:id" component={CustomerFormPage} />
-      <Route path="order" component={OrderFormPage} />
-      <Route path="order/:id" component={OrderDetailPage} />
-      <Route path="order/:id/edit" component={OrderFormPage} />
-      <Route path="order/:id/register-test" component={OrderRegisterTestPage} />
-      <Route path="product" component={ProductFormPage} />
-      <Route path="product/:id" component={ProductFormPage} />
-      <Route path="customers" component={CustomerListPage} />
-      <Route path="orders" component={OrderListPage} />
-      <Route path="products" component={ProductListPage} />
+      <Route path="users" component={UserListPage} />
+      <Route path="user" component={UserFormPage} />
+      <Route path="user/:id" component={UserFormPage} />
+      <Route path="chatbots" component={ChatbotListPage} />
+      <Route path="chatbot" component={ChatbotFormPage} />
+      <Route path="chatbot/:id" component={ChatbotDetailPage} />
+      <Route path="chatbot/:id/edit" component={ChatbotFormPage} />
+      <Route path="chatbot/:id/test" component={ChatbotRegisterTestPage} />
+      <Route path="chatbot/:id/tests" component={TestListPage} />
+      <Route path="history" component={HistoryListPage} />
       <Route path="about" component={AboutPage} />
       <Route path="*" component={NotFoundPage} />
     </Route>

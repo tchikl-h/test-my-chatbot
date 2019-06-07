@@ -22,22 +22,20 @@ import {
 import PageBase from "../components/PageBase";
 import Pagination from "../components/Pagination";
 import { connect } from "react-redux";
-import Dialog from "material-ui/Dialog";
-import FlatButton from "material-ui/FlatButton";
 import { getUsersByCompany, deleteUsers } from "../actions/usersActions";
 import { getUserFilteredList, getUserIsFetching, getUserFilteredById } from "../selectors/usersSelectors";
 import { getChatbotsByCompany } from "../actions/chatbotsActions";
 import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
+import Popup from "../components/dashboard/Popup";
 
-class CustomerListPage extends React.Component {
+class UserListPage extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       open: false,
       pageOfItems: [],
-      customerId: null,
-      dialogText: "Are you sure to do this?",
+      userId: null,
     };
 
     this.onChangePage = this.onChangePage.bind(this);
@@ -73,20 +71,19 @@ class CustomerListPage extends React.Component {
   }
 
   handleOpen(id) {
-    this.setState({ dialogText: "Are you sure to delete this data?" });
     this.setState({ open: true });
-    this.setState({ customerId: id });
+    this.setState({ userId: id });
   }
 
   handleClose(isConfirmed) {
     this.setState({ open: false });
 
-    if (isConfirmed && this.state.customerId) {
-      this.props.deleteUsers(this.state.customerId)
+    if (isConfirmed && this.state.userId) {
+      this.props.deleteUsers(this.state.userId)
       .then(() => {
         this.props.getUsersByCompany(localStorage.getItem("companyId"));
       })
-      this.setState({ customerId: null });
+      this.setState({ userId: null });
     }
   }
 
@@ -111,6 +108,12 @@ class CustomerListPage extends React.Component {
         fill: grey500
       },
       columns: {
+        star: {
+          width: "1%"
+        },
+        logo: {
+          width: "19%"
+        },
         firstName: {
           width: "20%"
         },
@@ -124,30 +127,11 @@ class CustomerListPage extends React.Component {
           width: "20%"
         }
       },
-      dialog: {
-        width: "20%",
-        maxWidth: "none"
-      },
       chatbotAvatar: {
         marginLeft: "3px",
         marginRight: "3px",
       }
     };
-
-    const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        value={false}
-        onTouchTap={() => this.handleClose(false)}
-      />,
-      <FlatButton
-        label="Confirm"
-        primary={true}
-        value={true}
-        onTouchTap={() => this.handleClose(true)}
-      />
-    ];
 
     return (
       <PageBase
@@ -158,7 +142,7 @@ class CustomerListPage extends React.Component {
           <div>
             {
               this.props.user.companyOwner === true &&
-              <Link to="/customer">
+              <Link to="/user">
                 <FloatingActionButton
                   backgroundColor="lightblue"
                   secondary={true}
@@ -183,7 +167,8 @@ class CustomerListPage extends React.Component {
               enableSelectAll={false}
             >
               <TableRow>
-                <TableHeaderColumn style={styles.columns.firstName} />
+                <TableHeaderColumn style={styles.columns.star} />
+                <TableHeaderColumn style={styles.columns.logo} />
                 <TableHeaderColumn style={styles.columns.firstName}>
                   First Name
                 </TableHeaderColumn>
@@ -206,8 +191,15 @@ class CustomerListPage extends React.Component {
             >
               {this.state.pageOfItems.map(user => (
                 <TableRow key={user.id}>
-                  <TableRowColumn style={styles.columns.firstName}>
-                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.lastName} />
+                  <TableRowColumn style={styles.columns.star}>
+                    {
+                      user.companyOwner && user.companyOwner === true && (
+                          <img width={30} src={require("../assets/img/star-badge.png")} title={"Company's owner"} />
+                      )
+                    }
+                  </TableRowColumn>
+                  <TableRowColumn style={styles.columns.logo}>
+                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />
                   </TableRowColumn>
                   <TableRowColumn style={styles.columns.firstName}>
                     {user.firstName}
@@ -228,7 +220,7 @@ class CustomerListPage extends React.Component {
                       <TableRowColumn style={styles.columns.edit}>
                       {
                         (this.props.user.id === user.id || this.props.user.companyOwner === true) && (
-                            <Link to={"/customer/" + user.id}>
+                            <Link to={"/user/" + user.id}>
                             <FloatingActionButton
                               zDepth={0}
                               mini={true}
@@ -271,15 +263,11 @@ class CustomerListPage extends React.Component {
             </div>
           </div>
 
-          <Dialog
-            title="Confirm Dialog "
-            actions={actions}
-            modal={true}
-            contentStyle={styles.dialog}
+          <Popup
+            dialogText={`Do you want to delete this user ?`}
+            handleClose={(isConfirmed) => this.handleClose(isConfirmed)}
             open={this.state.open}
-          >
-            {this.state.dialogText}
-          </Dialog>
+          />
         </div>
       </PageBase>
     );
@@ -295,4 +283,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getUsersByCompany, deleteUsers, getChatbotsByCompany })(CustomerListPage);
+export default connect(mapStateToProps, { getUsersByCompany, deleteUsers, getChatbotsByCompany })(UserListPage);

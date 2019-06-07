@@ -2,6 +2,7 @@ import historyApiFallback from 'connect-history-api-fallback';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import config from '../webpack.config.dev';
+import { exec } from 'child_process';
 
 const bundler = webpack(config);
 
@@ -47,11 +48,19 @@ server.listen(port, '0.0.0.0', function onStart(err) {
     console.log(err);
   }
   console.info('==> Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
+  console.info('-Launching all the containers-');
+  exec(`docker start $(docker ps -aq)`, (err, stdout, stderr) => {
+    if (err)
+      console.log(err);
+    else
+      console.log("Docker container successfully launched !")
+  });
 });
 
 function shutDown() {
-  console.log('Received kill signal, shutting down gracefully');
-  io.emit('disconnect');
+  console.log("distServer");
+  // console.log('Received kill signal, shutting down gracefully');
+  // io.emit('disconnect');
   process.exit(0);
 }
 

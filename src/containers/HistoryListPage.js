@@ -5,7 +5,7 @@ import {
   grey600
 } from "material-ui/styles/colors";
 
-class ProductListPage extends React.Component {
+class HistoryListPage extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -34,4 +34,4 @@ class ProductListPage extends React.Component {
   }
 }
 
-export default connect(null, null)(ProductListPage);
+export default connect(null, null)(HistoryListPage);

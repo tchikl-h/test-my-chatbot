@@ -9,7 +9,7 @@ import { getChatbotFilteredById } from "../selectors/chatbotsSelectors";
 import Chat from '../components/chat/Chat';
 
 
-class OrderRegisterTestPage extends React.Component {
+class ChatbotRegisterTestPage extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -32,7 +32,9 @@ class OrderRegisterTestPage extends React.Component {
     return (
         <div>
           <h3 style={styles.navigation}>Chatbots / {this.props.chatbot.project_name} / register test</h3>
-          <Chat/>
+          <Chat
+          chatbot={this.props.chatbot}
+          />
         </div>
     );
   }
@@ -44,4 +46,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { getChatbotsByUser })(OrderRegisterTestPage);
+export default connect(mapStateToProps, { getChatbotsByUser })(ChatbotRegisterTestPage);

@@ -4,6 +4,7 @@ import {
   LOGOUT_REQUEST,
   LOGOUT_SUCCESS
 } from "./actionTypes";
+// import bcrypt from 'bcryptjs';
 
 // Login actions
 
@@ -28,6 +29,7 @@ function receiveLogin(id) {
 export function loginUser(id, companyId) {
   return dispatch => {
     dispatch(requestLogin(id));
+    // localStorage.setItem("token", bcrypt.hashSync(`${JSON.stringify(companyId)}-${JSON.stringify(id)}`, bcrypt.genSaltSync(10)));
     localStorage.setItem("userId", JSON.stringify(id));
     localStorage.setItem("companyId", JSON.stringify(companyId));
     dispatch(receiveLogin(id));

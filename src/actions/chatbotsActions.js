@@ -175,15 +175,17 @@ export const postChatbots = chatbot => (dispatch) =>
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,
-        companyId: 1 // TODO: change this
+        companyId: chatbot.companyId
       }
     })
     .then((res) => {
       if (res.status === 200) {
+        console.log("200");
         dispatch(receivePostChatbots());
         resolve();
       }
       else {
+        console.log("500");
         dispatch(invalidatePostChatbots());
         reject();
       }

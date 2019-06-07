@@ -11,6 +11,7 @@ export function auth(
   state = {
     isFetching: false,
     isAuthenticated: localStorage.getItem("token") ? true : false,
+    //     isAuthenticated: localStorage.getItem("userId") ? true : false,
     userId: localStorage.getItem("userId")
       ? JSON.parse(localStorage.getItem("userId"))
       : {}

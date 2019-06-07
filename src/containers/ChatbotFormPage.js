@@ -10,20 +10,25 @@ import Formsy from "formsy-react";
 import CircularProgress from "material-ui/CircularProgress";
 import autoBind from "react-autobind";
 import { getChatbotsByUser, postChatbots, patchChatbots } from "../actions/chatbotsActions";
+import { getUsersByCompany } from "../actions/usersActions";
 import { getChatbotFilteredById, getChatbotIsFetching } from "../selectors/chatbotsSelectors";
+import { getUserFilteredById } from "../selectors/usersSelectors";
 
-class OrderFormPage extends React.Component {
+class ChatbotFormPage extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
     this.state = {
       isFetching: this.props.routeParams.id ? true : false, // fetching :id of the chatbot if exists
-      chatbot: {}
+      chatbot: {
+        companyId: this.props.user.companyId
+      }
     };
   }
 
   componentDidMount() {
     this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
+    this.props.getUsersByCompany(localStorage.getItem("companyId"));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -43,14 +48,14 @@ class OrderFormPage extends React.Component {
     if (this.state.chatbot.id) {
       this.props.patchChatbots(this.state.chatbot)
       .then(() => {
-        this.props.router.push("/orders");
+        this.props.router.push("/chatbots");
       });
     }
     else {
       this.props.postChatbots(this.state.chatbot)
       .then(() => {
         this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
-        this.props.router.push("/orders");
+        this.props.router.push("/chatbots");
       })
     }
   }
@@ -98,6 +103,12 @@ class OrderFormPage extends React.Component {
 
     if (isFetching) {
       return <CircularProgress />;
+    } else if (this.props.user.companyOwner !== true) {
+      return (
+        <PageBase title="Chatbot" navigation="Chatbots / creation">
+        <p>You don't have the permission to edit this chatbot</p>
+        </PageBase>
+      )
     } else {
       return (
         <PageBase title="Chatbot" navigation="Chatbots / creation">
@@ -107,30 +118,6 @@ class OrderFormPage extends React.Component {
             onInvalidSubmit={this.notifyFormError}
           >
             <GridList cols={1} cellHeight={70}>
-              {/* <GridTile>
-                <FormsySelect
-                  floatingLabelText="Owner"
-                  value={order.customer ? order.customer.id : 0}
-                  onChange={this.handleChange}
-                  style={styles.customWidth}
-                  name="customerId"
-                >
-                  {customerList.map((customer, index) => (
-                    <MenuItem
-                      key={index}
-                      name="customerId"
-                      value={customer.id}
-                      style={styles.menuItem}
-                      primaryText={
-                        customer.firstName
-                          ? customer.firstName + " " + customer.lastName
-                          : ""
-                      }
-                    />
-                  ))}
-                </FormsySelect>
-              </GridTile> */}
-
               <GridTile>
                 <FormsyText
                   hintText="My awesome chatbot"
@@ -260,7 +247,7 @@ class OrderFormPage extends React.Component {
             </GridList>
 
             <div style={styles.buttons}>
-              <Link to={this.state.chatbot.id ? `/order/${this.state.chatbot.id}` : "/orders"}>
+              <Link to={this.state.chatbot.id ? `/chatbot/${this.state.chatbot.id}` : "/chatbots"}>
                 <RaisedButton label="Cancel" />
               </Link>
 
@@ -281,7 +268,7 @@ class OrderFormPage extends React.Component {
   }
 }
 
-OrderFormPage.propTypes = {
+ChatbotFormPage.propTypes = {
   router: PropTypes.object,
   routeParams: PropTypes.object,
   chatbot: PropTypes.array,
@@ -291,9 +278,10 @@ OrderFormPage.propTypes = {
 
 function mapStateToProps(state, ownProps) {
   return {
+    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
     chatbot: getChatbotFilteredById(state, ownProps.params.id) || {},
     isFetching: getChatbotIsFetching(state),
   };
 }
 
-export default connect(mapStateToProps, { getChatbotsByUser, postChatbots, patchChatbots})(OrderFormPage);
+export default connect(mapStateToProps, { getChatbotsByUser, postChatbots, patchChatbots, getUsersByCompany})(ChatbotFormPage);

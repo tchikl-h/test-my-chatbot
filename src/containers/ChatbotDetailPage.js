@@ -13,12 +13,11 @@ import ChatbotBox from "../components/dashboard/ChatbotBox";
 import ChatbotActionBox from "../components/dashboard/ChatbotActionBox";
 import { getChatbotsByUser, deleteChatbots } from "../actions/chatbotsActions";
 import { getChatbotFilteredById } from "../selectors/chatbotsSelectors";
-import RaisedButton from "material-ui/RaisedButton";
-import Dialog from "material-ui/Dialog";
 import { getUsersByCompany } from "../actions/usersActions";
-import { getUserFilteredList } from "../selectors/usersSelectors";
+import { getUserFilteredList, getUserFilteredById } from "../selectors/usersSelectors";
+import Popup from "../components/dashboard/Popup";
 
-class OrderDetailPage extends React.Component {
+class ChatbotDetailPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,19 +30,18 @@ class OrderDetailPage extends React.Component {
     this.props.getUsersByCompany(localStorage.getItem("companyId"));
   }
 
-  openDeleteDialog() {
-    this.setState({open: true});
+  handleClose(isConfirmed) {
+    this.setState({ open: false });
+    if (isConfirmed && this.props.chatbot.id) {
+      this.props.deleteChatbots(this.props.chatbot.id)
+      .then(() => {
+        this.props.router.push("/chatbots");
+      })
+    }
   }
 
-  closeDeleteDialog() {
-    this.setState({open: false});
-  }
-
-  deleteChatbot() {
-    this.props.deleteChatbots(this.props.chatbot.id)
-    .then(() => {
-      this.props.router.push("/orders");
-    })
+  handleOpen() {
+    this.setState({ open: true });
   }
 
   render() {
@@ -55,11 +53,6 @@ class OrderDetailPage extends React.Component {
         color: grey600,
         paddingBottom: 15,
         display: "block"
-      },
-      dialog: {
-        width: "20%",
-        maxWidth: "none",
-        minWidth: 300
       }
     };
 
@@ -74,28 +67,31 @@ class OrderDetailPage extends React.Component {
                 value={this.props.chatbot.description}
                 userList={this.props.userList}
                 chatbot={this.props.chatbot}
-                openDeleteDialog={() => this.openDeleteDialog()}
+                user={this.props.user}
+                openDeleteDialog={() => this.handleOpen()}
               />
             </div>
           </div>
 
           <div className="row" style={{width: 518}}>
             <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-              <ChatbotActionBox
-                Icon={require("../assets/img/list-icon.png")}
-                title={this.props.chatbot.project_name}
-                value="Tests list"
-              />
+              <Link to={`${window.location.href}/tests`}>
+                <ChatbotActionBox
+                  Icon={require("../assets/img/list-icon.png")}
+                  title={this.props.chatbot.project_name}
+                  value="Tests list"
+                />
+              </Link>
             </div>
 
             <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-            <Link to={`${window.location.href}/register-test`}>
-              <ChatbotActionBox
-                Icon={require("../assets/img/chat-icon.png")}
-                title={this.props.chatbot.project_name}
-                value="Register test"
-              />
-            </Link>
+              <Link to={`${window.location.href}/test`}>
+                <ChatbotActionBox
+                  Icon={require("../assets/img/chat-icon.png")}
+                  title={this.props.chatbot.project_name}
+                  value="Register test"
+                />
+              </Link>
             </div>
 
             <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
@@ -114,35 +110,24 @@ class OrderDetailPage extends React.Component {
               />
             </div>
           </div>
-          <Dialog
-              title={`Do you want to delete ${this.props.chatbot.project_name}`}
-              open={this.state.open}
-              contentStyle={styles.dialog}
-              ignoreBackdropClick
-              ignoreEscapeKeyUp
-              maxWidth="xs"
-            >
-              <div>
-                <span>
-                  <RaisedButton onClick={() => this.closeDeleteDialog()} color="primary">
-                    Cancel
-                  </RaisedButton>
-                  <RaisedButton onClick={() => this.deleteChatbot()} color="primary">
-                    Delete
-                  </RaisedButton>
-                </span>
-              </div>
-            </Dialog>
+          
+          <Popup
+            dialogText={`Do you want to delete the chatbot ${this.props.chatbot.project_name} ?`}
+            handleClose={(isConfirmed) => this.handleClose(isConfirmed)}
+            open={this.state.open}
+          />
         </div>
     );
   }
 }
 
 function mapStateToProps(state, ownProps) {
+  console.log(ownProps);
   return {
+    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
     chatbot: getChatbotFilteredById(state, ownProps.params.id),
     userList: getUserFilteredList(state)
   };
 }
 
-export default connect(mapStateToProps, { getChatbotsByUser, deleteChatbots, getUsersByCompany })(OrderDetailPage);
+export default connect(mapStateToProps, { getChatbotsByUser, deleteChatbots, getUsersByCompany })(ChatbotDetailPage);

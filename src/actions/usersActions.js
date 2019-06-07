@@ -134,8 +134,12 @@ export const postUsers = user => (dispatch) =>
       method: 'post',
       url: 'http://localhost:8080/v1/users',
       data: {
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userName: user.userName,
+        password: user.password,
         chatbotIds: user.chatbotIds,
+        companyOwner: user.companyOwner,
         companyId: user.companyId,
       }
     })

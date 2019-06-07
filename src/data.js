@@ -5,15 +5,14 @@ import { cyan600, pink600, purple600 } from "material-ui/styles/colors";
 import ExpandLess from "material-ui/svg-icons/navigation/expand-less";
 import ExpandMore from "material-ui/svg-icons/navigation/expand-more";
 import ChevronRight from "material-ui/svg-icons/navigation/chevron-right";
-import ReactSVG from 'react-svg'
 
 const data = {
   menus: [
-    { text: "Dashboard", icon: <ReactSVG src="./assets/menu-logo/dashboard-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
-    { text: "Chatbots", icon: <ReactSVG src="./assets/menu-logo/robot-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/orders" },
-    { text: "Team", icon: <ReactSVG src="./assets/menu-logo/team-logo.svg" svgStyle={{ width: 27, height: 27 }} />, link: "/customers" },
-    { text: "History", icon: <ReactSVG src="./assets/menu-logo/history-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/products" },
-    { text: "About us", icon: <ReactSVG src="./assets/menu-logo/about-us-logo.svg" svgStyle={{ width: 25, height: 25 }} />, link: "/about" }
+    { text: "Dashboard", icon: <img src={require("./assets/menu-logo/dashboard-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
+    { text: "Chatbots", icon: <img src={require("./assets/menu-logo/robot-logo.svg")} svgStyle={{ width: 27, height: 27 }} />, link: "/chatbots" },
+    { text: "Team", icon: <img src={require("./assets/menu-logo/team-logo.svg")} svgStyle={{ width: 27, height: 27 }} />, link: "/users" },
+    { text: "History", icon: <img src={require("./assets/menu-logo/history-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/history" },
+    { text: "About us", icon: <img src={require("./assets/menu-logo/about-us-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/about" }
   ],
   signOutMenus: [
     { text: "Sign out", icon: <SettingsPower />, link: "/login" },
