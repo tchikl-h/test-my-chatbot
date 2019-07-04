@@ -50,9 +50,9 @@ class DashboardPage extends React.Component {
       </div>
     );
   }
-};
+}
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
   const { auth } = state;
   const { isAuthenticated, errorMessage, user } = auth;
   return {

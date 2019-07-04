@@ -21,7 +21,7 @@ class App extends React.Component {
     };
   }
 
-  doSomethingBeforeUnload = () => {
+  doSomethingBeforeUnload() {
     const {
       dispatch,
       user
@@ -32,12 +32,12 @@ class App extends React.Component {
   }
 
   // Setup the `beforeunload` event listener
-  setupBeforeUnloadListener = () => {
+  setupBeforeUnloadListener() {
       window.addEventListener("beforeunload", (ev) => {
           ev.preventDefault();
           return this.doSomethingBeforeUnload();
       });
-  };
+  }
 
   componentDidMount() {
     const {
@@ -76,7 +76,6 @@ class App extends React.Component {
       dispatch,
       isAuthenticated,
       errorMessage,
-      user,
       isFetching
     } = this.props;
     const firstName = this.props.user && this.props.user.firstName ? this.props.user.firstName : "";

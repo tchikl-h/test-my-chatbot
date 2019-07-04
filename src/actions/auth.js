@@ -1,6 +1,5 @@
 import {
   REQUEST_LOGIN,
-  RECEIVE_LOGIN,
   INVALIDATE_LOGIN,
   REQUEST_TOKEN,
   RECEIVE_TOKEN,
@@ -9,7 +8,6 @@ import {
   LOGOUT_SUCCESS
 } from "./actionTypes";
 import axios from "axios";
-import * as queryString from 'query-string';
 
 // Login actions
 
@@ -18,15 +16,6 @@ function requestLogin() {
     type: REQUEST_LOGIN,
     isFetching: true,
     isAuthenticated: false,
-  };
-}
-
-function receiveLogin(token) {
-  return {
-    type: RECEIVE_LOGIN,
-    isFetching: false,
-    isAuthenticated: true,
-    token: token
   };
 }
 

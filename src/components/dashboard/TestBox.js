@@ -20,7 +20,7 @@ class TestBox extends React.Component {
   }
 
   render() {
-    const { color, test, chatbotId } = this.props;
+    const { test } = this.props;
     const fontWeightMediumHeight = 18;
     const fontWeightMediumWidth = fontWeightMediumHeight / 2.2;
 

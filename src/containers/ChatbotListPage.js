@@ -82,7 +82,7 @@ class ChatbotListPage extends React.Component {
   }
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
   const { auth } = state;
   const { isAuthenticated, errorMessage, user } = auth;
   return {

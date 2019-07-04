@@ -112,7 +112,7 @@ class LeftDrawer extends React.Component {
         </div>
       </Drawer>
     );
-  };
+  }
 }
 
 function mapStateToProps(state) {

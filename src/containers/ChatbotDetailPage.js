@@ -1,10 +1,8 @@
-import React, { PropTypes } from "react";
+import React from "react";
 import { Link } from "react-router";
 import {
-  pink600,
   grey200,
   grey600,
-  white
 } from "material-ui/styles/colors";
 // import Data from '../data';
 import { connect } from "react-redux";

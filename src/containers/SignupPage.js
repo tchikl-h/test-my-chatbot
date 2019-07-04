@@ -15,7 +15,6 @@ import { loginUserWithToken } from "../actions/auth";
 import { getUserList, getUserIsFetching } from "../selectors/usersSelectors";
 import { postCompanies } from "../actions/companiesActions";
 import { postUsers } from "../actions/usersActions";
-import { Redirect } from 'react-router'
 
 class SignupPage extends React.Component {
   constructor(props) {

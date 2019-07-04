@@ -119,6 +119,7 @@ export const postCompanies = (name, description) => (dispatch) =>
 
 export const patchCompanies = (id, name, description) => (dispatch) =>
   new Promise(function(resolve, reject) {
+    console.log(description);
     dispatch(requestPatchCompanies());
     return axios({
       method: 'patch',

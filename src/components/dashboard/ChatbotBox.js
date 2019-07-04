@@ -1,6 +1,6 @@
 import React, { PropTypes } from "react";
 import Paper from "material-ui/Paper";
-import { white, grey800 } from "material-ui/styles/colors";
+import { grey800 } from "material-ui/styles/colors";
 import { typography } from "material-ui/styles";
 import { Link } from "react-router";
 

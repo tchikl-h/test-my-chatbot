@@ -1,18 +1,10 @@
 import React, { PropTypes } from "react";
 import Paper from "material-ui/Paper";
 import { Link } from "react-router";
-import FloatingActionButton from "material-ui/FloatingActionButton";
 import {
   grey800,
-  grey500,
-  green400,
-  grey200,
-  white,
 } from "material-ui/styles/colors";
-import ContentCreate from "material-ui/svg-icons/content/create";
-import ActionDelete from "material-ui/svg-icons/action/delete";
 import { typography } from "material-ui/styles";
-import CircularProgress from "material-ui/CircularProgress";
 
 class ErrorBox extends React.Component {
   constructor(props) {

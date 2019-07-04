@@ -2,7 +2,6 @@ import historyApiFallback from 'connect-history-api-fallback';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import config from '../webpack.config.dev';
-import { exec } from 'child_process';
 
 const bundler = webpack(config);
 
