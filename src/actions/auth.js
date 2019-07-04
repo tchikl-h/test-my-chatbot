@@ -1,38 +1,91 @@
 import {
-  LOGIN_REQUEST,
-  LOGIN_SUCCESS,
+  REQUEST_LOGIN,
+  RECEIVE_LOGIN,
+  INVALIDATE_LOGIN,
+  REQUEST_TOKEN,
+  RECEIVE_TOKEN,
+  INVALIDATE_TOKEN,
   LOGOUT_REQUEST,
   LOGOUT_SUCCESS
 } from "./actionTypes";
-// import bcrypt from 'bcryptjs';
+import axios from "axios";
+import * as queryString from 'query-string';
 
 // Login actions
 
-function requestLogin(id) {
+function requestLogin() {
   return {
-    type: LOGIN_REQUEST,
+    type: REQUEST_LOGIN,
     isFetching: true,
     isAuthenticated: false,
-    UserId: id
   };
 }
 
-function receiveLogin(id) {
+function receiveLogin(token) {
   return {
-    type: LOGIN_SUCCESS,
+    type: RECEIVE_LOGIN,
     isFetching: false,
     isAuthenticated: true,
-    userId: id
+    token: token
   };
 }
 
-export function loginUser(id, companyId) {
+function invalidateLogin() {
+  return {
+    type: INVALIDATE_LOGIN,
+  };
+}
+
+function requestToken() {
+  return {
+    type: REQUEST_TOKEN,
+    isFetching: true,
+    isAuthenticated: false,
+  };
+}
+
+function receiveToken(user) {
+  return {
+    type: RECEIVE_TOKEN,
+    isFetching: false,
+    isAuthenticated: true,
+    user: user
+  };
+}
+
+function invalidateToken() {
+  return {
+    type: INVALIDATE_TOKEN,
+  };
+}
+
+export function loginUser(user) {
   return dispatch => {
-    dispatch(requestLogin(id));
-    // localStorage.setItem("token", bcrypt.hashSync(`${JSON.stringify(companyId)}-${JSON.stringify(id)}`, bcrypt.genSaltSync(10)));
-    localStorage.setItem("userId", JSON.stringify(id));
-    localStorage.setItem("companyId", JSON.stringify(companyId));
-    dispatch(receiveLogin(id));
+    dispatch(requestLogin());
+    return axios.get(`http://localhost:8080/v1/encrypt/${encodeURIComponent(JSON.stringify(user))}`)
+    .then((res) => {
+      if (res.status === 200) {
+        localStorage.setItem("token", res.data);
+        dispatch(loginUserWithToken(res.data));
+        // dispatch(receiveLogin(res.data));
+      }
+      else
+        dispatch(invalidateLogin());
+    })
+  }
+}
+
+export function loginUserWithToken(token) {
+  return dispatch => {
+    dispatch(requestToken());
+    return axios.get(`http://localhost:8080/v1/decrypt/${encodeURIComponent(token)}`)
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveToken(res.data));
+      }
+      else
+        dispatch(invalidateToken());
+    })
   }
 }
 
@@ -58,8 +111,7 @@ function receiveLogout() {
 export function logoutUser() {
   return dispatch => {
     dispatch(requestLogout());
-    localStorage.removeItem("userId")
-    localStorage.removeItem("companyId")
+    localStorage.removeItem("token")
     dispatch(receiveLogout());
   };
 }

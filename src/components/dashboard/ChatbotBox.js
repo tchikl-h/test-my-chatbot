@@ -65,7 +65,6 @@ class ChatbotBox extends React.Component {
         marginRight: "3px",
       }
     };
-    console.log(userList);
 
     return (
       <Paper style={styles.paperSize}>
@@ -94,7 +93,7 @@ class ChatbotBox extends React.Component {
           <span style={styles.number}>{value}</span>
           {
             usersForChatbot.map(user => {
-              return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />)
+              return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.firstName}-${user.lastName}.svg`} title={user.userName} />)
             })
           }
         </div>

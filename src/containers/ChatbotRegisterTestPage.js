@@ -7,7 +7,8 @@ import { typography } from "material-ui/styles";
 import { getChatbotsByUser } from "../actions/chatbotsActions";
 import { getChatbotFilteredById } from "../selectors/chatbotsSelectors";
 import Chat from '../components/chat/Chat';
-
+import CircularProgress from "material-ui/CircularProgress";
+import { getUserFilteredById } from "../selectors/usersSelectors";
 
 class ChatbotRegisterTestPage extends React.Component {
   constructor(props) {
@@ -15,7 +16,7 @@ class ChatbotRegisterTestPage extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
+    this.props.getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id);
   }
 
   render() {
@@ -28,21 +29,29 @@ class ChatbotRegisterTestPage extends React.Component {
         display: "block"
       },
     };
-
-    return (
-        <div>
-          <h3 style={styles.navigation}>Chatbots / {this.props.chatbot.project_name} / register test</h3>
-          <Chat
-          chatbot={this.props.chatbot}
-          />
-        </div>
-    );
+    if (!this.props.chatbot)
+      return <CircularProgress />;
+    else
+      return (
+          <div>
+            <h3 style={styles.navigation}>Chatbots / {this.props.chatbot.project_name} / register test</h3>
+            <Chat
+            chatbot={this.props.chatbot}
+            />
+          </div>
+      );
   }
 }
 
 function mapStateToProps(state, ownProps) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
-    chatbot: getChatbotFilteredById(state, ownProps.params.id)
+    user: getUserFilteredById(state, user.id) || {},
+    currentUser: user,
+    chatbot: getChatbotFilteredById(state, ownProps.params.id),
+    isAuthenticated,
+    errorMessage,
   };
 }
 

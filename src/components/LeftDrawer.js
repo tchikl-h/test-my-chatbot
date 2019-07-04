@@ -12,9 +12,9 @@ import ContentFilter from "material-ui/svg-icons/content/filter-list";
 // import FontIcon from 'material-ui/FontIcon';
 import SettingsPower from "material-ui/svg-icons/action/settings-power";
 import VpnKey from "material-ui/svg-icons/communication/vpn-key";
+import { getUserFilteredById } from "../selectors/usersSelectors";
 import { connect } from "react-redux";
 import { getUsersByCompany } from "../actions/usersActions";
-import { getUserFilteredById } from "../selectors/usersSelectors";
 
 class LeftDrawer extends React.Component {
   constructor(props) {
@@ -22,7 +22,7 @@ class LeftDrawer extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getUsersByCompany(localStorage.getItem("companyId"));
+    this.props.getUsersByCompany(this.props.currentUser.companyId);
   }
 
   handleClick(event) {
@@ -72,10 +72,10 @@ class LeftDrawer extends React.Component {
         {/*<div style={styles.logo}>Material Admin<div>*/}
         <div style={styles.avatar.div}>
           <Avatar
-            src={`https://avatars.dicebear.com/v2/identicon/${this.props.user.lastName}.svg`}
+            src={`https://avatars.dicebear.com/v2/identicon/${this.props.user.firstName}-${this.props.user.lastName}.svg`}
             size={50}
             style={styles.avatar.icon}
-            title={this.props.user.lastName}
+            title={this.props.user.userName}
           />
           <span style={styles.avatar.span}>
             {this.props.username}
@@ -116,8 +116,13 @@ class LeftDrawer extends React.Component {
 }
 
 function mapStateToProps(state) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
-    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
+    user: getUserFilteredById(state, user.id) || {},
+    currentUser: user,
+    isAuthenticated,
+    errorMessage,
   };
 }
 

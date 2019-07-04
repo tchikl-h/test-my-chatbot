@@ -4,6 +4,10 @@ import {
   INVALIDATE_GET_CHATBOTS_BY_USER, REQUEST_GET_CHATBOTS_BY_USER, RECEIVE_GET_CHATBOTS_BY_USER,
   INVALIDATE_POST_CHATBOTS, REQUEST_POST_CHATBOTS, RECEIVE_POST_CHATBOTS,
   INVALIDATE_PATCH_CHATBOTS, REQUEST_PATCH_CHATBOTS, RECEIVE_PATCH_CHATBOTS,
+  INVALIDATE_DELETE_CHATBOTS, REQUEST_DELETE_CHATBOTS, RECEIVE_DELETE_CHATBOTS,
+  REQUEST_START_CHATBOTS, RECEIVE_START_CHATBOTS, INVALIDATE_START_CHATBOTS,
+  REQUEST_STOP_CHATBOTS, RECEIVE_STOP_CHATBOTS, INVALIDATE_STOP_CHATBOTS,
+  REQUEST_LAUNCH_CHATBOTS, RECEIVE_LAUNCH_CHATBOTS, INVALIDATE_LAUNCH_CHATBOTS,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -11,7 +15,8 @@ const initialState = {
   didInvalidate: false,
   lastUpdated: "",
   chatbots: [],
-  chatbotsFiltered: [],
+  chatbotsFilteredByCompany: [],
+  chatbotsFilteredByUser: [],
 };
 
 export default function(state = initialState, action) {
@@ -51,7 +56,7 @@ export default function(state = initialState, action) {
         ...state,
         isFetching: false,
         didInvalidate: false,
-        chatbotsFiltered: action.chatbotsFiltered,
+        chatbotsFilteredByCompany: action.chatbotsFiltered,
         lastUpdated: action.receivedAt
       }
     case INVALIDATE_GET_CHATBOTS_BY_USER:
@@ -70,7 +75,7 @@ export default function(state = initialState, action) {
         ...state,
         isFetching: false,
         didInvalidate: false,
-        chatbotsFiltered: action.chatbotsFiltered,
+        chatbotsFilteredByUser: action.chatbotsFiltered,
         lastUpdated: action.receivedAt
       }
     case INVALIDATE_POST_CHATBOTS:
@@ -102,6 +107,74 @@ export default function(state = initialState, action) {
         didInvalidate: false
       }
     case RECEIVE_PATCH_CHATBOTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+      }
+    case INVALIDATE_DELETE_CHATBOTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_DELETE_CHATBOTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_DELETE_CHATBOTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+      }
+    case INVALIDATE_START_CHATBOTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_START_CHATBOTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_START_CHATBOTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+      }
+    case INVALIDATE_STOP_CHATBOTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_STOP_CHATBOTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_STOP_CHATBOTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+      }
+    case INVALIDATE_LAUNCH_CHATBOTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_LAUNCH_CHATBOTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_LAUNCH_CHATBOTS:
       return {
         ...state,
         isFetching: false,

@@ -23,10 +23,11 @@ import PageBase from "../components/PageBase";
 import Pagination from "../components/Pagination";
 import { connect } from "react-redux";
 import { getUsersByCompany, deleteUsers } from "../actions/usersActions";
-import { getUserFilteredList, getUserIsFetching, getUserFilteredById } from "../selectors/usersSelectors";
+import { getUserFilteredList, getUserIsFetching } from "../selectors/usersSelectors";
 import { getChatbotsByCompany } from "../actions/chatbotsActions";
-import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
+import { getChatbotFilteredByCompanyList } from "../selectors/chatbotsSelectors";
 import Popup from "../components/dashboard/Popup";
+import { getUserFilteredById } from "../selectors/usersSelectors";
 
 class UserListPage extends React.Component {
   constructor(props) {
@@ -43,8 +44,8 @@ class UserListPage extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getUsersByCompany(localStorage.getItem("companyId"));
-    this.props.getChatbotsByCompany(localStorage.getItem("companyId"))
+    this.props.getUsersByCompany(this.props.currentUser.companyId);
+    this.props.getChatbotsByCompany(this.props.currentUser.companyId)
   }
 
   /* eslint-disable */
@@ -75,13 +76,13 @@ class UserListPage extends React.Component {
     this.setState({ userId: id });
   }
 
-  handleClose(isConfirmed) {
+  handleClose(data) {
     this.setState({ open: false });
 
-    if (isConfirmed && this.state.userId) {
+    if (data.isConfirmed && this.state.userId) {
       this.props.deleteUsers(this.state.userId)
       .then(() => {
-        this.props.getUsersByCompany(localStorage.getItem("companyId"));
+        this.props.getUsersByCompany(this.props.user.companyId);
       })
       this.setState({ userId: null });
     }
@@ -199,7 +200,7 @@ class UserListPage extends React.Component {
                     }
                   </TableRowColumn>
                   <TableRowColumn style={styles.columns.logo}>
-                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.lastName}.svg`} title={user.userName} />
+                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.firstName}-${user.lastName}.svg`} title={user.userName} />
                   </TableRowColumn>
                   <TableRowColumn style={styles.columns.firstName}>
                     {user.firstName}
@@ -211,7 +212,6 @@ class UserListPage extends React.Component {
                   {
                     this.props.chatbotList && this.props.chatbotList.map(chatbot => {
                       if (user.chatbotIds.includes(chatbot.id)) {
-                        console.log(chatbot.project_name);
                         return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/gridy/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
                       }
                     })
@@ -265,8 +265,9 @@ class UserListPage extends React.Component {
 
           <Popup
             dialogText={`Do you want to delete this user ?`}
-            handleClose={(isConfirmed) => this.handleClose(isConfirmed)}
+            handleClose={(data) => this.handleClose(data)}
             open={this.state.open}
+            display={false}
           />
         </div>
       </PageBase>
@@ -275,11 +276,30 @@ class UserListPage extends React.Component {
 }
 
 function mapStateToProps(state) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
-    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
-    userList: getUserFilteredList(state),
-    chatbotList: getChatbotFilteredList(state),
+    user: getUserFilteredById(state, user.id) || {},
+    currentUser: user,
+    userList: getUserFilteredList(state).sort(function(a, b){
+      if(a.firstName.toLowerCase() < b.firstName.toLowerCase()) { return -1; }
+      if(a.firstName.toLowerCase() > b.firstName.toLowerCase()) { return 1; }
+      return 0;
+    }).sort(function(a, b){
+      if(a.companyOwner === true && b.companyOwner === false) { return -1; }
+      if(a.companyOwner === false && b.companyOwner === true) { return 1; }
+      if(a.companyOwner === false && b.companyOwner === false) { return 0; }
+      return 0;
+    }).sort(function(a, b){
+      if(a.id === user.id && b.id !== user.id) { return -1; }
+      if(a.id !== user.id && b.id === user.id) { return 1; }
+      if(a.id !== user.id && b.id !== user.id) { return 0; }
+      return 0;
+    }),
+    chatbotList: getChatbotFilteredByCompanyList(state),
     isFetching: getUserIsFetching(state),
+    isAuthenticated,
+    errorMessage,
   };
 }
 

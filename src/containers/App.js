@@ -7,7 +7,11 @@ import ThemeDefault from "../theme-default";
 import Data from "../data";
 import { connect } from "react-redux";
 import LoginPage from "./LoginPage";
-import { loginUser, logoutUser } from "../actions/auth";
+import { loginUser, logoutUser, loginUserWithToken } from "../actions/auth";
+import { stopChatbot } from "../actions/chatbotsActions";
+import { getUserFilteredById } from "../selectors/usersSelectors";
+import { getChatbotsByUser } from "../actions/chatbotsActions";
+import SignupPage from "./SignupPage";
 
 class App extends React.Component {
   constructor(props) {
@@ -15,6 +19,44 @@ class App extends React.Component {
     this.state = {
       navDrawerOpen: true
     };
+  }
+
+  doSomethingBeforeUnload = () => {
+    const {
+      dispatch,
+      user
+    } = this.props;
+    for(let i = 0; i < user.chatbotIds.length; i++) {
+      dispatch(stopChatbot(user.companyId, user.id, user.chatbotIds[i]));
+    }
+  }
+
+  // Setup the `beforeunload` event listener
+  setupBeforeUnloadListener = () => {
+      window.addEventListener("beforeunload", (ev) => {
+          ev.preventDefault();
+          return this.doSomethingBeforeUnload();
+      });
+  };
+
+  componentDidMount() {
+    const {
+      dispatch,
+    } = this.props;
+    // TODO: currentUser empty
+    // console.log(this.props.currentUser)
+    dispatch(getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id));
+      // Activate the event listener
+      this.setupBeforeUnloadListener();
+  }
+
+  componentWillMount() {
+    const {
+      dispatch,
+    } = this.props;
+    if (localStorage.getItem("token")) {
+      dispatch(loginUserWithToken(localStorage.getItem("token")));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -37,9 +79,8 @@ class App extends React.Component {
       user,
       isFetching
     } = this.props;
-
-    const firstName = user && user.firstName ? user.firstName : "";
-    const lastName = user && user.lastName ? user.lastName : "";
+    const firstName = this.props.user && this.props.user.firstName ? this.props.user.firstName : "";
+    const lastName = this.props.user && this.props.user.lastName ? this.props.user.lastName : "";
 
     let { navDrawerOpen } = this.state;
     const paddingLeftDrawerOpen = 250;
@@ -57,7 +98,6 @@ class App extends React.Component {
 
       }
     };
-
     return (
       <MuiThemeProvider muiTheme={ThemeDefault}>
         <div>
@@ -77,15 +117,24 @@ class App extends React.Component {
                   signOutMenus={Data.signOutMenus}
                   username={`${firstName} ${lastName}`}
                   onLogoutClick={() => dispatch(logoutUser())}
+                  user={this.props.user}
                 />
-
+z
                 <div style={styles.container}>{this.props.children}</div>
               </div>
             )}
-          {!isAuthenticated && (
+          {!isAuthenticated &&
+            window.location.href.includes("signup") && (
+            <SignupPage
+              errorMessage={errorMessage}
+              onLoginClick={(user) => dispatch(loginUser(user))}
+            />
+          )}
+          {!isAuthenticated &&
+            !window.location.href.includes("signup") && (
             <LoginPage
               errorMessage={errorMessage}
-              onLoginClick={(userId, companyId) => dispatch(loginUser(userId, companyId))}
+              onLoginClick={(user) => dispatch(loginUser(user))}
             />
           )}
         </div>
@@ -107,12 +156,12 @@ App.propTypes = {
 /* eslint-disable */
 function mapStateToProps(state) {
   const { auth } = state;
-  const { isFetching, isAuthenticated, errorMessage, user } = auth;
-
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
+    user : getUserFilteredById(state, user.id) || {},
+    currentUser: user,
     isAuthenticated,
     errorMessage,
-    user
   };
 }
 

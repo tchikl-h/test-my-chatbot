@@ -74,13 +74,19 @@
 
 .button {
 	margin: 0; padding: 0; box-sizing: border-box;
-	width: 9%;
+	width: 5%;
 	background: #ff4d4d;
 	border: none;
 	padding: 10px;
 	color: #eeeeee;
 	font-size: 1.3em;
 	border-radius: 10px;
+}
+
+.recordButton {
+	position: fixed;
+	padding-top: 11px;
+	padding-left: 20px;
 }
 
 .messageList {

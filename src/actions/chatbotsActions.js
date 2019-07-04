@@ -5,6 +5,9 @@ import {
   INVALIDATE_POST_CHATBOTS, REQUEST_POST_CHATBOTS, RECEIVE_POST_CHATBOTS,
   INVALIDATE_PATCH_CHATBOTS, REQUEST_PATCH_CHATBOTS, RECEIVE_PATCH_CHATBOTS,
   INVALIDATE_DELETE_CHATBOTS, REQUEST_DELETE_CHATBOTS, RECEIVE_DELETE_CHATBOTS,
+  REQUEST_START_CHATBOTS, RECEIVE_START_CHATBOTS, INVALIDATE_START_CHATBOTS,
+  REQUEST_STOP_CHATBOTS, RECEIVE_STOP_CHATBOTS, INVALIDATE_STOP_CHATBOTS,
+  REQUEST_LAUNCH_CHATBOTS, RECEIVE_LAUNCH_CHATBOTS, INVALIDATE_LAUNCH_CHATBOTS,
 } from "./actionTypes";
 import axios from "axios";
 
@@ -122,6 +125,102 @@ export function invalidateDeleteChatbots() {
   }
 }
 
+export function requestStartChatbots() {
+  return {
+    type: REQUEST_START_CHATBOTS,
+  }
+}
+
+export function receiveStartChatbots() {
+  return {
+    type: RECEIVE_START_CHATBOTS,
+  }
+}
+
+export function invalidateStartChatbots() {
+  return {
+    type: INVALIDATE_START_CHATBOTS,
+  }
+}
+
+export function requestStopChatbots() {
+  return {
+    type: REQUEST_STOP_CHATBOTS,
+  }
+}
+
+export function receiveStopChatbots() {
+  return {
+    type: RECEIVE_STOP_CHATBOTS,
+  }
+}
+
+export function invalidateStopChatbots() {
+  return {
+    type: INVALIDATE_STOP_CHATBOTS,
+  }
+}
+
+export function requestLaunchChatbots() {
+  return {
+    type: REQUEST_LAUNCH_CHATBOTS,
+  }
+}
+
+export function receiveLaunchChatbots() {
+  return {
+    type: RECEIVE_LAUNCH_CHATBOTS,
+  }
+}
+
+export function invalidateLaunchChatbots() {
+  return {
+    type: INVALIDATE_LAUNCH_CHATBOTS,
+  }
+}
+
+export function startChatbot(companyId, userId, chatbotId) {
+  return function(dispatch) {
+    dispatch(requestStartChatbots());
+    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/start`)
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveStartChatbots());
+      }
+      else
+        dispatch(invalidateStartChatbots());
+    })
+  }
+}
+
+export function stopChatbot(companyId, userId, chatbotId) {
+  return function(dispatch) {
+    dispatch(requestStopChatbots());
+    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/stop`)
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveStopChatbots());
+      }
+      else
+        dispatch(invalidateStopChatbots());
+    })
+  }
+}
+
+export function launchChatbot(companyId, userId, chatbotId) {
+  return function(dispatch) {
+    dispatch(requestLaunchChatbots());
+    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`)
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveLaunchChatbots());
+      }
+      else
+        dispatch(invalidateLaunchChatbots());
+    })
+  }
+}
+
 export function getChatbots() {
   return function(dispatch) {
     dispatch(requestGetChatbots());
@@ -180,12 +279,10 @@ export const postChatbots = chatbot => (dispatch) =>
     })
     .then((res) => {
       if (res.status === 200) {
-        console.log("200");
         dispatch(receivePostChatbots());
         resolve();
       }
       else {
-        console.log("500");
         dispatch(invalidatePostChatbots());
         reject();
       }
@@ -205,7 +302,7 @@ export const patchChatbots = chatbot => (dispatch) =>
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,
-        companyId: 1 // TODO: change this
+        companyId: chatbot.companyId
       }
     })
     .then((res) => {

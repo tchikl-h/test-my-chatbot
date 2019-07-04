@@ -95,19 +95,21 @@ export function getCompanies() {
 
 export const postCompanies = (name, description) => (dispatch) =>
   new Promise(function(resolve, reject) {
+    console.log(name);
+    console.log(description);
     dispatch(requestPostCompanies());
     return axios({
       method: 'post',
       url: 'http://localhost:8080/v1/companies',
       data: {
         companyName: name,
-        companyDescription: description
+        companyDescription: "description"
       }
     })
     .then((res) => {
       if (res.status === 200) {
         dispatch(receivePostCompanies());
-        resolve();
+        resolve(res.data);
       }
       else
         dispatch(invalidatePostCompanies());
@@ -123,7 +125,7 @@ export const patchCompanies = (id, name, description) => (dispatch) =>
       url: `http://localhost:8080/v1/companies/${id}`,
       data: {
         companyName: name,
-        companyDescription: description
+        companyDescription: "description"
       }
     })
     .then((res) => {

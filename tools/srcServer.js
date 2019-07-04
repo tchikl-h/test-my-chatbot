@@ -41,13 +41,13 @@ server.listen(port, '0.0.0.0', function onStart(err) {
     console.log(err);
   }
   console.info('==> Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
-  console.info('-Launching all the containers-');
-  exec(`docker start $(docker ps -aq)`, (err, stdout, stderr) => {
-    if (err)
-      console.log(err);
-    else
-      console.log("Docker container successfully launched !")
-  });
+  // console.info('-Launching all the containers-');
+  // exec(`docker start $(docker ps -aq)`, (err, stdout, stderr) => {
+  //   if (err)
+  //     console.log(err);
+  //   else
+  //     console.log("Docker container successfully launched !")
+  // });
 });
 
 function shutDown() {
@@ -71,6 +71,15 @@ io.sockets.on('connection', function(socket) {
             msg: data.msg
           });
           console.log(" => " + data.msg.text);
+        });
+
+        socket.in(room).on('logs', function(data) {
+          console.log("Server : on.logs on room "+room);
+          // 2) send bot
+          io.sockets.in(room).emit('logs', {
+            test: data
+          });
+          console.log(data);
         });
       
         // 1) receive user

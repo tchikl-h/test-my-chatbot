@@ -8,8 +8,7 @@ export default class StatusBox extends React.Component {
       return (
   
         <div className="statusBox">
-          {this.props.status} <br/>
-          there {this.props.count > 1 ? 'are' : 'is'} {this.props.count} {this.props.count > 1 ? 'participants' : 'participant'}
+          {this.props.text}
         </div>
   
       );

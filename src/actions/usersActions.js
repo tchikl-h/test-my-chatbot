@@ -146,7 +146,7 @@ export const postUsers = user => (dispatch) =>
     .then((res) => {
       if (res.status === 200) {
         dispatch(receivePostUsers());
-        resolve();
+        resolve(res.data);
       }
       else
         dispatch(invalidatePostUsers());
@@ -161,7 +161,8 @@ export const patchUsers = user => (dispatch) =>
       method: 'patch',
       url: `http://localhost:8080/v1/users/${user.id}`,
       data: {
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         chatbotIds: user.chatbotIds,
         companyId: user.companyId,
       }

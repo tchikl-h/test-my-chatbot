@@ -3,6 +3,7 @@ import {
   INVALIDATE_GET_TESTS_BY_CHATBOT, REQUEST_GET_TESTS_BY_CHATBOT, RECEIVE_GET_TESTS_BY_CHATBOT,
   INVALIDATE_POST_TESTS, REQUEST_POST_TESTS, RECEIVE_POST_TESTS,
   INVALIDATE_PATCH_TESTS, REQUEST_PATCH_TESTS, RECEIVE_PATCH_TESTS,
+  INVALIDATE_DELETE_TESTS, REQUEST_DELETE_TESTS, RECEIVE_DELETE_TESTS,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -82,6 +83,23 @@ export default function(state = initialState, action) {
         didInvalidate: false
       }
     case RECEIVE_PATCH_TESTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+      }
+    case INVALIDATE_DELETE_TESTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_DELETE_TESTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_DELETE_TESTS:
       return {
         ...state,
         isFetching: false,

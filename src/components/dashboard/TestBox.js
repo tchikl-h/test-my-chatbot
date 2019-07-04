@@ -12,6 +12,7 @@ import {
 import ContentCreate from "material-ui/svg-icons/content/create";
 import ActionDelete from "material-ui/svg-icons/action/delete";
 import { typography } from "material-ui/styles";
+import CircularProgress from "material-ui/CircularProgress";
 
 class TestBox extends React.Component {
   constructor(props) {
@@ -20,58 +21,62 @@ class TestBox extends React.Component {
 
   render() {
     const { color, test, chatbotId } = this.props;
+    const fontWeightMediumHeight = 18;
+    const fontWeightMediumWidth = fontWeightMediumHeight / 2.2;
 
+    const fontWeightLightHeight = 16;
+    const fontWeightLightWidth = fontWeightLightHeight / 2.3;
+
+    const contentWidth = 800;
+    const contentHeight = (test.name.length / fontWeightMediumWidth) > (test.description.length / fontWeightLightWidth) ? test.name.length / 30 * fontWeightMediumHeight : test.description.length / 40 * fontWeightLightHeight
+    
+    // TODO: to fix ! when name & description size are long it displays weirdly
     const styles = {
       paperSize: {
-        height: 60,
-        width: 500
+        height: contentHeight + 50,
+        width: contentWidth
       },
       content: {
-        padding: "5px 30px",
-        marginLeft: 0,
-        height: 60,
-        width: 500
+        display: "flex",
+        alignItems: "center",
+        width: contentWidth + 61
       },
       name: {
         display: "inline-block",
-        padding: "12px",
+        verticalAlign: "top",
         marginLeft: 15,
+        width: 30 * fontWeightMediumWidth,
         fontWeight: typography.fontWeightMedium,
-        fontSize: 18,
+        fontSize: `${fontWeightMediumHeight}px`,
         color: grey800
       },
       description: {
-        marginLeft: "10px",
         display: "inline-block",
+        verticalAlign: "top",
+        width: 40 * fontWeightLightWidth,
+        marginLeft: 10,
         fontWeight: typography.fontWeightLight,
-        fontSize: 16,
+        fontSize: `${fontWeightLightHeight}px`,
         color: grey800
-      },
-      iconSpan: {
-        float: "left",
-        height: 60,
-        width: 60,
-        textAlign: "center",
-        marginTop: "10px",
-        backgroundColor: color
       },
       icon: {
         height: 30,
         width: 30,
-        marginTop: 20,
         maxWidth: "100%"
       },
       editButton: {
-        marginLeft: 165,
+        marginLeft: 60,
         paddingRight: 25,
-        display: "inline-block",
       },
       editButtonIcon: {
         fill: white
       },
       deleteButton: {
         fill: grey500,
-        display: "inline-block",
+      },
+      resultIcon: {
+        paddingLeft: 25,
+        width: 50
       },
     };
 
@@ -102,6 +107,15 @@ class TestBox extends React.Component {
           >
             <ActionDelete />
           </FloatingActionButton>
+          {
+            this.props.testLaunched ?
+              test.completed ?
+                test.result === 0 ?
+                  <img style={styles.resultIcon} src={require(`../../assets/img/success.png`)} />
+                  : <img style={styles.resultIcon} src={require(`../../assets/img/fail.png`)} />
+              : <CircularProgress style={styles.resultIcon} />
+            : console.log("NOTHING")
+          }
         </div>
       </Paper>
     );
@@ -113,6 +127,7 @@ TestBox.propTypes = {
   test: PropTypes.object,
   chatbotId: PropTypes.integer,
   onDelete: PropTypes.func,
+  testLaunched: PropTypes.boolean
 };
 
 export default TestBox;

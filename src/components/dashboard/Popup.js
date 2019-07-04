@@ -5,6 +5,18 @@ import Dialog from "material-ui/Dialog";
 class Popup extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+        name: '',
+        description: '',
+      };
+  }
+
+  changeName(e) {
+    this.setState({ name : e.target.value });
+  }
+
+  changeDescription(e) {
+    this.setState({ description : e.target.value });
   }
 
   render() {
@@ -15,6 +27,15 @@ class Popup extends React.Component {
         width: "20%",
         maxWidth: "none"
       },
+      input: {
+        boxSizing: "border-box",
+        border: "20%",
+        width: "100%",
+        fontSize: "1.3em",
+        outline: "none",
+        backgroundColor: "#eeeeee",
+        marginTop: "10px"
+      }
     };
 
     const actions = [
@@ -22,13 +43,13 @@ class Popup extends React.Component {
         label="Cancel"
         primary={true}
         value={false}
-        onTouchTap={() => this.props.handleClose(false)}
+        onTouchTap={() => this.props.handleClose({isConfirmed: false, name: this.state.name, description: this.state.description})}
       />,
       <FlatButton
         label="Confirm"
         primary={true}
         value={true}
-        onTouchTap={() => this.props.handleClose(true)}
+        onTouchTap={() => this.props.handleClose({isConfirmed: true, name: this.state.name, description: this.state.description})}
       />
     ];
 
@@ -42,6 +63,14 @@ class Popup extends React.Component {
               open={this.props.open}
             >
             {dialogText}
+            {
+              this.props.display && (
+                <div>
+                  <input style={styles.input} autoFocus onChange={(e) => this.changeName(e)} value={this.state.name} placeholder="Type a name here"/>
+                  <input style={styles.input} onChange={(e) => this.changeDescription(e)} value={this.state.description} placeholder="Type a description here"/>
+                </div>
+              )
+            }
           </Dialog>
         </div>
     );

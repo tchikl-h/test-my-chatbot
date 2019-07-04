@@ -27,8 +27,8 @@ class ChatbotFormPage extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
-    this.props.getUsersByCompany(localStorage.getItem("companyId"));
+    this.props.getChatbotsByUser(this.props.user.companyId, this.props.user.id);
+    this.props.getUsersByCompany(this.props.user.companyId);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -54,7 +54,7 @@ class ChatbotFormPage extends React.Component {
     else {
       this.props.postChatbots(this.state.chatbot)
       .then(() => {
-        this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
+        this.props.getChatbotsByUser(this.props.user.companyId, this.props.user.id);
         this.props.router.push("/chatbots");
       })
     }
@@ -111,7 +111,7 @@ class ChatbotFormPage extends React.Component {
       )
     } else {
       return (
-        <PageBase title="Chatbot" navigation="Chatbots / creation">
+        <PageBase title="Chatbot" navigation="Chatbots / creation" height={"100%"} width={"60%"}>
           <Formsy.Form
             onValid={this.enableButton}
             onValidSubmit={this.handleClick}
@@ -277,10 +277,14 @@ ChatbotFormPage.propTypes = {
 };
 
 function mapStateToProps(state, ownProps) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
-    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
+    user: getUserFilteredById(state, user.id) || {},
     chatbot: getChatbotFilteredById(state, ownProps.params.id) || {},
     isFetching: getChatbotIsFetching(state),
+    isAuthenticated,
+    errorMessage,
   };
 }
 

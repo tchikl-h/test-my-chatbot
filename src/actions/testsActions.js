@@ -173,20 +173,21 @@ export const patchTests = (id, name, description, chatbotId) => (dispatch) =>
     })
   });
 
-export const deleteTests = id => (dispatch) =>
+export const deleteTests = (userId, testId) => (dispatch) =>
   new Promise(function(resolve, reject) {
     dispatch(requestDeleteTests());
     return axios({
       method: 'delete',
-      url: `http://localhost:8080/v1/tests/${id}`
+      url: `http://localhost:8080/v1/users/${userId}/tests/${testId}`
     })
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveDeleteTests());
         resolve();
       }
-      else
+      else {
         dispatch(invalidateDeleteTests());
         reject();
+      }
     })
   });

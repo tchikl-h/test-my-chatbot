@@ -13,17 +13,15 @@ export const getChatbotById = (store, id) => {
     }
 }
 
-// getChatbotState(store) ? getChatbotList(store).map((chatbot) => {
-//     if (chatbot.id === id)
-//         return chatbot
-// }) : {}
+export const getChatbotFilteredByCompanyList = store =>
+getChatbotState(store) ? getChatbotState(store).chatbotsFilteredByCompany : [];
 
-export const getChatbotFilteredList = store =>
-getChatbotState(store) ? getChatbotState(store).chatbotsFiltered : [];
+export const getChatbotFilteredByUserList = store =>
+getChatbotState(store) ? getChatbotState(store).chatbotsFilteredByUser : [];
 
 export const getChatbotFilteredById = (store, id) => {
     if (getChatbotState(store)) {
-        let chatbotArray = getChatbotFilteredList(store).filter((chatbot) => {
+        let chatbotArray = getChatbotFilteredByUserList(store).filter((chatbot) => {
             return chatbot.id == id;
         });
         if (chatbotArray && chatbotArray.length === 1)

@@ -15,7 +15,7 @@ import { FormsyText, FormsyCheckbox } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import autoBind from "react-autobind";
 import { getChatbotsByCompany } from "../actions/chatbotsActions";
-import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
+import { getChatbotFilteredByCompanyList } from "../selectors/chatbotsSelectors";
 
 class UserFormPage extends React.Component {
   constructor(props) {
@@ -28,16 +28,17 @@ class UserFormPage extends React.Component {
         lastName: "",
         userName: "",
         password: "",
+        repassword: "",
         chatbotIds: [],
         companyOwner: false,
-        companyId: localStorage.getItem("companyId")
+        companyId: this.props.currentUser.companyId
       }
     };
   }
 
   componentDidMount() {
-    this.props.getUsersByCompany(localStorage.getItem("companyId"));
-    this.props.getChatbotsByCompany(localStorage.getItem("companyId"))
+    this.props.getUsersByCompany(this.props.currentUser.companyId);
+    this.props.getChatbotsByCompany(this.props.currentUser.companyId)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,7 +83,6 @@ class UserFormPage extends React.Component {
       })
     }
     else {
-      console.log(this.state.user);
       this.props.postUsers(this.state.user)
       .then(() => {
         this.props.router.push("/users");
@@ -100,8 +100,6 @@ class UserFormPage extends React.Component {
         user.chatbotIds.push(chatbotId);
       }
     }
-    console.log("onChangeChatbot, dealing with: "+chatbotId);
-    console.log(user);
     this.setState({user: user})
   }
 
@@ -118,95 +116,153 @@ class UserFormPage extends React.Component {
       },
       card: {
         width: 120
-      }
+      },
+      container: {
+        width: "100%",
+        margin: "auto",
+        padding: 5
+      },
+      leftBlock: {
+        float: "left",
+        width: "300px",
+      },
+      rightBlock: {
+        width: "300px",
+        marginLeft: "350px"
+      } 
     };
     if (isFetching) {
       return <CircularProgress />;
-    } else {
+    } else if (this.props.user.companyOwner !== true && this.props.routeParams.id != this.props.user.id) {
       return (
         <PageBase title="User" navigation={`Team / ${user.firstName} ${user.lastName}`}>
+        <p>You don't have the permission to edit this user</p>
+        </PageBase>
+      )
+    } else {
+      return (
+        <PageBase title="User" navigation={`Team / ${user.firstName} ${user.lastName}`} height={"100%"} width={"46%"}>
           <Formsy.Form
             onValid={this.enableButton}
             onInvalid={this.disableButton}
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cellHeight={this.props.user.id ? 300 : 450}>
-              <GridTile>
-                <FormsyText
-                  hintText="First Name"
-                  floatingLabelText="First Name"
-                  name="firstName"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={user.firstName ? user.firstName : ""}
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isWords: "Please provide valid first name",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                />
-
-                <FormsyText
-                  hintText="Last Name"
-                  floatingLabelText="Last Name"
-                  fullWidth={true}
-                  name="lastName"
-                  onChange={this.handleChange}
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isWords: "Please provide valid first name",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  value={user.lastName ? user.lastName : ""}
-                />
-                {
-                  !this.props.user.id && (
-                  <div>
+            <GridList cellHeight={!this.props.user.id ? 400 : 200}>
+              <GridTile style={{width: "1000px"}}>
+                <div style={styles.container}>
+                  <div style={styles.leftBlock}>
                     <FormsyText
-                      hintText="Username"
-                      floatingLabelText="username"
-                      fullWidth={true}
-                      name="userName"
+                      floatingLabelText="First Name"
+                      name="firstName"
                       onChange={this.handleChange}
+                      fullWidth={true}
+                      value={user.firstName ? user.firstName : ""}
+                      validations={{
+                        isWords: true
+                      }}
                       validationErrors={{
+                        isWords: "Please provide valid first name",
                         isDefaultRequiredValue: "This is a required field"
                       }}
-                      value={user.userName ? user.userName : ""}
+                      required
                     />
 
                     <FormsyText
-                      hintText="Password"
-                      floatingLabelText="Password"
+                      floatingLabelText="Last Name"
                       fullWidth={true}
-                      name="password"
-                      type="password"
+                      name="lastName"
                       onChange={this.handleChange}
+                      validations={{
+                        isWords: true
+                      }}
                       validationErrors={{
+                        isWords: "Please provide valid first name",
                         isDefaultRequiredValue: "This is a required field"
                       }}
-                      value={user.password ? user.password : ""}
+                      value={user.lastName ? user.lastName : ""}
+                      required
                     />
+
+                    {
+                    !this.props.user.id && (
+                      <div>
+                        <FormsyText
+                          floatingLabelText="Username"
+                          fullWidth={true}
+                          name="userName"
+                          onChange={this.handleChange}
+                          validationErrors={{
+                            isDefaultRequiredValue: "This is a required field"
+                          }}
+                          value={user.userName ? user.userName : ""}
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
-                  )
-                }
-                {
-                  this.props.chatbotList.map(chatbot => (
-                    <FormsyCheckbox
-                    label={chatbot.project_name}
-                    onChange={() => this.onChangeChatbot(chatbot.id)}
-                    name="chatbotIds" // TODO: to change
-                    defaultChecked={user.id ? user.chatbotIds.includes(chatbot.id) : false}
-                    validationErrors={{
-                      isDefaultRequiredValue: "This is a required field"
-                    }}
-                  />
-                  ))
-                }
+                  <div>
+                    <div style={styles.rightBlock}>
+                      {
+                        !this.props.user.id && (
+                          <div>
+                            <FormsyText
+                              floatingLabelText="Password"
+                              fullWidth={true}
+                              name="password"
+                              type="password"
+                              onChange={this.handleChange}
+                              validations={{
+                                minLength: 3
+                              }}
+                              validationErrors={{
+                                minLength: "Please provide a valid password",
+                                isDefaultRequiredValue: "This is a required field"
+                              }}
+                              value={user.password ? user.password : ""}
+                              required
+                            />
+
+                            <FormsyText
+                              floatingLabelText="Password"
+                              fullWidth={true}
+                              name="password"
+                              type="password"
+                              onChange={this.handleChange}
+                              validationError='Passwords do not match'
+                              validations={{
+                                minLength: 3,
+                                equalsField: 'password'
+                              }}
+                              validationErrors={{
+                                minLength: "Please provide a valid password",
+                                equalsField: "Passwords do not match",
+                                isDefaultRequiredValue: "This is a required field"
+                              }}
+                              value={user.repassword ? user.repassword : ""}
+                              required
+                            />
+                          </div>
+                        )
+                      }
+                    </div>
+                    {
+                      this.props.currentUser.companyOwner === true && this.props.chatbotList.map(chatbot => (
+                        <div style={styles.rightBlock}>
+                          <FormsyCheckbox
+                            label={chatbot.project_name}
+                            onChange={() => this.onChangeChatbot(chatbot.id)}
+                            name="chatbotIds" // TODO: to change
+                            defaultChecked={user.id ? user.chatbotIds.includes(chatbot.id) : false}
+                            validationErrors={{
+                              isDefaultRequiredValue: "This is a required field"
+                            }}
+                          />
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
               </GridTile>
 
               <GridTile>
@@ -242,10 +298,15 @@ class UserFormPage extends React.Component {
 }
 
 function mapStateToProps(state, ownProps) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
     user: getUserFilteredById(state, ownProps.params.id) || {},
     isFetching: getUserIsFetching(state),
-    chatbotList: getChatbotFilteredList(state),
+    chatbotList: getChatbotFilteredByCompanyList(state),
+    isAuthenticated,
+    errorMessage,
+    currentUser: user
   };
 }
 

@@ -10,6 +10,7 @@ import { FormsyText } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import { connect } from "react-redux";
 import { getUsers } from "../actions/usersActions";
+import { loginUserWithToken } from "../actions/auth";
 import { getUserList, getUserIsFetching } from "../selectors/usersSelectors";
 import bcrypt from 'bcryptjs';
 
@@ -59,7 +60,7 @@ class LoginPage extends React.Component {
     }
     const connectionResult = bcrypt.compareSync(password, user.password);
     if (connectionResult)
-      this.props.onLoginClick(user.id, user.companyId);
+      this.props.onLoginClick(user);
     else
       this.setState({errorMessage: "Username or password is invalid"})
   }
@@ -139,7 +140,8 @@ class LoginPage extends React.Component {
         }
       },
       loginBtn: {
-        float: "right"
+        float: "right",
+        marginRight: "5px"
       },
       btn: {
         background: "#4f81e9",
@@ -212,13 +214,11 @@ class LoginPage extends React.Component {
                       disabled={!this.state.canSubmit}
                     />
                   </Link>
-                  <Link to="/">
+                  <Link to="/signup">
                     <RaisedButton
-                      label="Sign in"
+                      label="Sign up"
                       primary={true}
-                      onClick={() => this.handleClick(event)}
                       style={styles.loginBtn}
-                      disabled={!this.state.canSubmit}
                     />
                   </Link>
                 </div>
@@ -248,4 +248,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getUsers })(LoginPage);
+export default connect(mapStateToProps, { getUsers, loginUserWithToken })(LoginPage);

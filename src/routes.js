@@ -13,12 +13,16 @@ import ChatbotDetailPage from "./containers/ChatbotDetailPage";
 import ChatbotRegisterTestPage from "./containers/ChatbotRegisterTestPage";
 import TestListPage from "./containers/TestListPage";
 import HistoryListPage from "./containers/HistoryListPage";
+import SignupPage from "./containers/SignupPage";
+import LoginPage from "./containers/LoginPage";
 
 export default (
   <Route>
     <Route path="/" component={App}>
       <IndexRoute component={Dashboard} />
       <Route path="dashboard" component={Dashboard} />
+      <Route path="signup" component={SignupPage} />
+      <Route path="login" component={LoginPage} />
       <Route path="users" component={UserListPage} />
       <Route path="user" component={UserFormPage} />
       <Route path="user/:id" component={UserFormPage} />

@@ -10,9 +10,10 @@ import {
 import { connect } from "react-redux";
 import { typography } from "material-ui/styles";
 import InfoBox from "../components/dashboard/InfoBox";
-import { getChatbotFilteredList } from "../selectors/chatbotsSelectors";
+import { getChatbotFilteredByUserList } from "../selectors/chatbotsSelectors";
 import { getChatbotsByUser } from "../actions/chatbotsActions"
 import { getUsersByCompany } from "../actions/usersActions";
+import CircularProgress from "material-ui/CircularProgress";
 import { getUserFilteredById } from "../selectors/usersSelectors";
 
 class ChatbotListPage extends React.Component {
@@ -21,8 +22,8 @@ class ChatbotListPage extends React.Component {
   }
   
   componentDidMount() {
-    this.props.getChatbotsByUser(localStorage.getItem("companyId"), localStorage.getItem("userId"));
-    this.props.getUsersByCompany(localStorage.getItem("companyId"));
+    this.props.getChatbotsByUser(this.props.serializedUser.companyId, this.props.serializedUser.id);
+    this.props.getUsersByCompany(this.props.serializedUser.companyId);
   }
 
   render() {
@@ -45,8 +46,10 @@ class ChatbotListPage extends React.Component {
         display: "block"
       }
     };
-
-    return (
+    if (!this.props.user || !this.props.chatbotList)
+      return <CircularProgress />;
+    else {
+      return (
         <div>
           <h3 style={styles.navigation}>Chatbots</h3>
           {
@@ -74,13 +77,24 @@ class ChatbotListPage extends React.Component {
           </div>
         </div>
     );
+    }
+      
   }
 }
 
 function mapStateToProps(state, ownProps) {
+  const { auth } = state;
+  const { isAuthenticated, errorMessage, user } = auth;
   return {
-    user: getUserFilteredById(state, localStorage.getItem("userId")) || {},
-    chatbotList: getChatbotFilteredList(state)
+    serializedUser: user,
+    user: getUserFilteredById(state, user.id) || {},
+    chatbotList: getChatbotFilteredByUserList(state).sort(function(a, b){
+      if(a.firstName < b.firstName) { return -1; }
+      if(a.firstName > b.firstName) { return 1; }
+      return 0;
+    }),
+    isAuthenticated,
+    errorMessage,
   };
 }
 

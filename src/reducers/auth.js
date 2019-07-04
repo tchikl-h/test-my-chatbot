@@ -1,6 +1,10 @@
 import {
-  LOGIN_REQUEST,
-  LOGIN_SUCCESS,
+  REQUEST_LOGIN,
+  RECEIVE_LOGIN,
+  INVALIDATE_LOGIN,
+  REQUEST_TOKEN,
+  RECEIVE_TOKEN,
+  INVALIDATE_TOKEN,
   LOGOUT_SUCCESS
 } from "../actions/actionTypes";
 
@@ -10,29 +14,46 @@ import {
 export function auth(
   state = {
     isFetching: false,
-    isAuthenticated: localStorage.getItem("token") ? true : false,
-    //     isAuthenticated: localStorage.getItem("userId") ? true : false,
-    userId: localStorage.getItem("userId")
-      ? JSON.parse(localStorage.getItem("userId"))
-      : {}
+    didInvalidate: false,
+    isAuthenticated: false,
+    token: localStorage.getItem("token")
+      ? localStorage.getItem("token")
+      : {},
+    user: {}
   },
   action
 ) {
   switch (action.type) {
-    case LOGIN_REQUEST:
+    case REQUEST_LOGIN:
       return Object.assign({}, state, {
         isFetching: true,
         isAuthenticated: false,
-        userId: action.userId
       });
-    case LOGIN_SUCCESS:
+    case RECEIVE_LOGIN:
       return Object.assign({}, state, {
         isFetching: false,
         isAuthenticated: true,
         errorMessage: "",
-        userId: localStorage.getItem("userId")
-          ? JSON.parse(localStorage.getItem("userId"))
-          : {}
+      });
+    case INVALIDATE_LOGIN:
+      return Object.assign({}, state, {
+        didInvalidate: true
+      });
+    case REQUEST_TOKEN:
+      return Object.assign({}, state, {
+        isFetching: true,
+        isAuthenticated: false,
+      });
+    case RECEIVE_TOKEN:
+      return Object.assign({}, state, {
+        isFetching: false,
+        isAuthenticated: true,
+        errorMessage: "",
+        user: action.user
+      });
+    case INVALIDATE_TOKEN:
+      return Object.assign({}, state, {
+        didInvalidate: true
       });
     case LOGOUT_SUCCESS:
       return Object.assign({}, state, {
