@@ -11,6 +11,7 @@ export default {
     'webpack-hot-middleware/client?reload=true',
     './src/index'
   ],
+  externals: ["fs"],
   target: 'web',
   output: {
     path: `${__dirname}/src`,

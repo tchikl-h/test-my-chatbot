@@ -182,7 +182,7 @@ export function invalidateLaunchChatbots() {
 export function startChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStartChatbots());
-    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/start`)
+    return axios.get(`process.env.HOST/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/start`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveStartChatbots());
@@ -196,7 +196,7 @@ export function startChatbot(companyId, userId, chatbotId) {
 export function stopChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStopChatbots());
-    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/stop`)
+    return axios.get(`process.env.HOST/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/stop`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveStopChatbots());
@@ -210,7 +210,7 @@ export function stopChatbot(companyId, userId, chatbotId) {
 export function launchChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestLaunchChatbots());
-    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`)
+    return axios.get(`process.env.HOST/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveLaunchChatbots());
@@ -224,7 +224,7 @@ export function launchChatbot(companyId, userId, chatbotId) {
 export function getChatbots() {
   return function(dispatch) {
     dispatch(requestGetChatbots());
-    return axios.get('http://localhost:8080/v1/chatbots')
+    return axios.get('process.env.HOST/v1/chatbots')
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveGetChatbots(res.data));
@@ -238,7 +238,7 @@ export function getChatbots() {
 export function getChatbotsByCompany(id) {
   return function(dispatch) {
     dispatch(requestGetChatbotsByCompany());
-    return axios.get(`http://localhost:8080/v1/companies/${id}/chatbots`)
+    return axios.get(`process.env.HOST/v1/companies/${id}/chatbots`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetChatbotsByCompany(res.data));
@@ -251,7 +251,7 @@ export function getChatbotsByCompany(id) {
 export function getChatbotsByUser(companyId, userId) {
   return function(dispatch) {
     dispatch(requestGetChatbotsByUser());
-    return axios.get(`http://localhost:8080/v1/companies/${companyId}/users/${userId}/chatbots`)
+    return axios.get(`process.env.HOST/v1/companies/${companyId}/users/${userId}/chatbots`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetChatbotsByUser(res.data));
@@ -266,7 +266,7 @@ export const postChatbots = chatbot => (dispatch) =>
     dispatch(requestPostChatbots());
     return axios({
       method: 'post',
-      url: 'http://localhost:8080/v1/chatbots',
+      url: 'process.env.HOST/v1/chatbots',
       data: {
         projectName: chatbot.project_name,
         description: chatbot.description,
@@ -294,7 +294,7 @@ export const patchChatbots = chatbot => (dispatch) =>
     dispatch(requestPatchChatbots());
     return axios({
       method: 'patch',
-      url: `http://localhost:8080/v1/chatbots/${chatbot.id}`,
+      url: `process.env.HOST/v1/chatbots/${chatbot.id}`,
       data: {
         projectName: chatbot.project_name,
         description: chatbot.description,
@@ -321,7 +321,7 @@ export const deleteChatbots = id => (dispatch) =>
     dispatch(requestDeleteChatbots());
     return axios({
       method: 'delete',
-      url: `http://localhost:8080/v1/chatbots/${id}`
+      url: `process.env.HOST/v1/chatbots/${id}`
     })
     .then((res) => {
       if (res.status === 200) {

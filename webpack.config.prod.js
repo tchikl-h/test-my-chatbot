@@ -16,6 +16,7 @@ export default {
   noInfo: true,
   entry: './src/index',
   target: 'web',
+  externals: ["fs"],
   output: {
     path: `${__dirname}/dist`,
     publicPath: './',

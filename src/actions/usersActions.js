@@ -104,7 +104,7 @@ export function invalidateDeleteUsers() {
 export function getUsers() {
   return function(dispatch) {
     dispatch(requestGetUsers());
-    return axios.get('http://localhost:8080/v1/users')
+    return axios.get('process.env.HOST/v1/users')
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetUsers(res.data));
@@ -117,7 +117,7 @@ export function getUsers() {
 export function getUsersByCompany(id) {
   return function(dispatch) {
     dispatch(requestGetUsersByCompany());
-    return axios.get(`http://localhost:8080/v1/companies/${id}/users`)
+    return axios.get(`process.env.HOST/v1/companies/${id}/users`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetUsersByCompany(res.data));
@@ -132,7 +132,7 @@ export const postUsers = user => (dispatch) =>
     dispatch(requestPostUsers());
     return axios({
       method: 'post',
-      url: 'http://localhost:8080/v1/users',
+      url: 'process.env.HOST/v1/users',
       data: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -159,7 +159,7 @@ export const patchUsers = user => (dispatch) =>
     dispatch(requestPatchUsers());
     return axios({
       method: 'patch',
-      url: `http://localhost:8080/v1/users/${user.id}`,
+      url: `process.env.HOST/v1/users/${user.id}`,
       data: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -183,7 +183,7 @@ export const deleteUsers = id => (dispatch) =>
     dispatch(requestDeleteUsers());
     return axios({
       method: 'delete',
-      url: `http://localhost:8080/v1/users/${id}`
+      url: `process.env.HOST/v1/users/${id}`
     })
     .then((res) => {
       if (res.status === 200) {
