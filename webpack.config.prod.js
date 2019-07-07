@@ -4,6 +4,7 @@ import WebpackMd5Hash from 'webpack-md5-hash';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import autoprefixer from 'autoprefixer';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+const Dotenv = require('dotenv-webpack');
 
 const GLOBALS = {
   'process.env.NODE_ENV': JSON.stringify('production'),
@@ -16,13 +17,14 @@ export default {
   noInfo: true,
   entry: './src/index',
   target: 'web',
-  externals: ["fs"],
   output: {
     path: `${__dirname}/dist`,
     publicPath: './',
     filename: '[name].[chunkhash].js'
   },
   plugins: [
+    new Dotenv(),
+
     new WebpackMd5Hash(),
 
     new webpack.optimize.OccurenceOrderPlugin(),

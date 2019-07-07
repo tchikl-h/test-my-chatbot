@@ -83,7 +83,7 @@ export function invalidateDeleteCompanies() {
 export function getCompanies() {
   return function(dispatch) {
     dispatch(requestGetCompanies());
-    return axios.get('process.env.HOST/v1/companies')
+    return axios.get(`${process.env.HOST}/v1/companies`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetCompanies(res.data));
@@ -100,7 +100,7 @@ export const postCompanies = (name, description) => (dispatch) =>
     dispatch(requestPostCompanies());
     return axios({
       method: 'post',
-      url: 'process.env.HOST/v1/companies',
+      url: `${process.env.HOST}/v1/companies`,
       data: {
         companyName: name,
         companyDescription: "description"
@@ -123,7 +123,7 @@ export const patchCompanies = (id, name, description) => (dispatch) =>
     dispatch(requestPatchCompanies());
     return axios({
       method: 'patch',
-      url: `process.env.HOST/v1/companies/${id}`,
+      url: `${process.env.HOST}/v1/companies/${id}`,
       data: {
         companyName: name,
         companyDescription: "description"
@@ -145,7 +145,7 @@ export const deleteCompanies = id => (dispatch) =>
     dispatch(requestDeleteCompanies());
     return axios({
       method: 'delete',
-      url: `process.env.HOST/v1/companies/${id}`
+      url: `${process.env.HOST}/v1/companies/${id}`
     })
     .then((res) => {
       if (res.status === 200) {

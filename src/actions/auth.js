@@ -51,7 +51,7 @@ function invalidateToken() {
 export function loginUser(user) {
   return dispatch => {
     dispatch(requestLogin());
-    return axios.get(`process.env.HOST/v1/encrypt/${encodeURIComponent(JSON.stringify(user))}`)
+    return axios.get(`${process.env.HOST}/v1/encrypt/${encodeURIComponent(JSON.stringify(user))}`)
     .then((res) => {
       if (res.status === 200) {
         localStorage.setItem("token", res.data);
@@ -67,7 +67,7 @@ export function loginUser(user) {
 export function loginUserWithToken(token) {
   return dispatch => {
     dispatch(requestToken());
-    return axios.get(`process.env.HOST/v1/decrypt/${encodeURIComponent(token)}`)
+    return axios.get(`${process.env.HOST}/v1/decrypt/${encodeURIComponent(token)}`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveToken(res.data));

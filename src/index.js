@@ -1,6 +1,4 @@
 /* eslint-disable import/default */
-require('dotenv').config();
-console.log(process.env.HOST);
 import 'babel-polyfill';
 import React from "react";
 import { render } from "react-dom";

@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import autoprefixer from 'autoprefixer';
+const Dotenv = require('dotenv-webpack');
 
 export default {
   debug: true,
@@ -11,7 +12,6 @@ export default {
     'webpack-hot-middleware/client?reload=true',
     './src/index'
   ],
-  externals: ["fs"],
   target: 'web',
   output: {
     path: `${__dirname}/src`,
@@ -19,10 +19,7 @@ export default {
     filename: 'bundle.js'
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'),
-      __DEV__: true
-    }),
+    new Dotenv(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
