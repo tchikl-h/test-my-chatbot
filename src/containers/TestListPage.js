@@ -50,7 +50,7 @@ class TestListPage extends React.Component {
   
   componentWillMount() {
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id);
-    socket = io.connect("http://localhost:3000");
+    socket = io.connect(process.env.HOST);
     socket.emit('room', `${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
     console.log(`Entered room ${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
     socket.on('logs', (test) => this.updateTestList(test));
