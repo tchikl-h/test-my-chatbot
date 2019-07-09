@@ -26,7 +26,7 @@ class Chat extends React.Component {
   }
 
   componentWillMount() {
-    socket = io.connect("http://localhost:3000");
+    socket = io.connect(process.env.HOST);
     const {
       chatbot,
     } = this.props;
