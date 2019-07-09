@@ -104,7 +104,7 @@ export function invalidateDeleteTests() {
 export function getTests() {
   return function(dispatch) {
     dispatch(requestGetTests());
-    return axios.get(`${process.env.HOST}/v1/tests`)
+    return axios.get(`${process.env.API_HOST}/v1/tests`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetTests(res.data));
@@ -117,7 +117,7 @@ export function getTests() {
 export function getTestsByChatbot(id) {
   return function(dispatch) {
     dispatch(requestGetTestsByChatbot());
-    return axios.get(`${process.env.HOST}/v1/chatbots/${id}/tests`)
+    return axios.get(`${process.env.API_HOST}/v1/chatbots/${id}/tests`)
     .then((res) => {
       if (res.status === 200)
         dispatch(receiveGetTestsByChatbot(res.data));
@@ -132,7 +132,7 @@ export const postTests = (name, description, chatbotId) => (dispatch) =>
     dispatch(requestPostTests());
     return axios({
       method: 'post',
-      url: `${process.env.HOST}/v1/tests`,
+      url: `${process.env.API_HOST}/v1/tests`,
       data: {
         name: name,
         description: description,
@@ -155,7 +155,7 @@ export const patchTests = (id, name, description, chatbotId) => (dispatch) =>
     dispatch(requestPatchTests());
     return axios({
       method: 'patch',
-      url: `${process.env.HOST}/v1/tests/${id}`,
+      url: `${process.env.API_HOST}/v1/tests/${id}`,
       data: {
         name: name,
         description: description,
@@ -178,7 +178,7 @@ export const deleteTests = (userId, testId) => (dispatch) =>
     dispatch(requestDeleteTests());
     return axios({
       method: 'delete',
-      url: `${process.env.HOST}/v1/users/${userId}/tests/${testId}`
+      url: `${process.env.API_HOST}/v1/users/${userId}/tests/${testId}`
     })
     .then((res) => {
       if (res.status === 200) {
