@@ -32,11 +32,13 @@ class TestListPage extends React.Component {
       id: 0,
       testList: [],
       testError: null,
-      launchTestsButtonDisabled: false
+      launchTestsButtonDisabled: false,
+      testLaunchedAtLeastOnce: false
     };
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setState({testLaunchedAtLeastOnce: false});
     let testList = nextProps.testList;
     for(let i = 0; i < testList.length; i++) {
       const newTest = Object.assign({}, testList[i]);
@@ -62,6 +64,19 @@ class TestListPage extends React.Component {
     this.props.getTestsByChatbot(this.props.params.id);
   }
 
+  resetTestList() {
+    let testList = this.props.testList;
+    for(let i = 0; i < testList.length; i++) {
+      const newTest = Object.assign({}, testList[i]);
+      newTest['completed'] = false;
+      newTest['result'] = -1; // {-1: init, 0: success, 1: error}
+      newTest['logs'] = "";
+      testList[i] = newTest;
+    }
+    this.setState({ testList: testList });
+    this.setState({testError: null});
+  }
+
   updateTestList(data) {
     console.log(data);
     // TODO: tests need to be in the same order as on jasmine
@@ -71,10 +86,15 @@ class TestListPage extends React.Component {
         testList[i].completed = true;
         testList[i].result = data.test.result;
         testList[i].logs = data.test.logs;
-        if (i === this.state.testList.length - 1 && testList[i].result === 0) {
+        console.log(testList[i].completed);
+        console.log(true);
+        console.log(testList[i].result);
+        console.log(1);
+        if (i === this.state.testList.length - 1) {
           this.setState({launchTestsButtonDisabled: false});
         }
-        else if (testList[i].completed === true && testList[i].result === 1) {
+        if (testList[i].completed === true && testList[i].result === 1) {
+          console.log("OUPS, LITTLE PROBLEMO !");
           console.log(testList[i]);
           this.setState({testError: testList[i]});
         }
@@ -85,6 +105,7 @@ class TestListPage extends React.Component {
   }
 
   handleClose(data) {
+    console.log(this.props.testList);
     this.setState({ open: false });
     if (data.isConfirmed && this.state.id && this.props.currentUser) {
       this.props.deleteTests(this.props.currentUser.id, this.state.id)
@@ -111,7 +132,9 @@ class TestListPage extends React.Component {
     if (this.props.user && this.props.chatbot) {
       this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id)
       .then(() => {
+        this.resetTestList();
         this.setState({launchTestsButtonDisabled: true});
+        this.setState({testLaunchedAtLeastOnce: true});
       });
     }
   }
@@ -184,7 +207,7 @@ class TestListPage extends React.Component {
                             test={test}
                             chatbotId={this.props.routeParams.id}
                             onDelete={(id) => this.onDelete(id)}
-                            testLaunched={this.state.launchTestsButtonDisabled}
+                            testLaunched={this.state.testLaunchedAtLeastOnce}
                           />
                       </div>
                 ))}

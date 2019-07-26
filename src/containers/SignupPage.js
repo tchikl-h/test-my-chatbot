@@ -247,6 +247,7 @@ class SignupPage extends React.Component {
                       value={this.state.user.lastName ? this.state.user.lastName : ""}
                       required
                     />
+                     {/* TODO: verify if username not already taken */}
                     <FormsyText
                         hintText="Username"
                         floatingLabelText="Username"

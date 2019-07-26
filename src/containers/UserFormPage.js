@@ -184,6 +184,7 @@ class UserFormPage extends React.Component {
                     />
 
                     {
+                      // TODO: verify if username not already taken
                     !this.props.user.id && (
                       <div>
                         <FormsyText
