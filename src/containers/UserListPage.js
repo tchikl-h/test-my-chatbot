@@ -19,6 +19,7 @@ import {
   green400,
   white
 } from "material-ui/styles/colors";
+import CircularProgress from "material-ui/CircularProgress";
 import PageBase from "../components/PageBase";
 import Pagination from "../components/Pagination";
 import { connect } from "react-redux";
@@ -28,6 +29,8 @@ import { getChatbotsByCompany } from "../actions/chatbotsActions";
 import { getChatbotFilteredByCompanyList } from "../selectors/chatbotsSelectors";
 import Popup from "../components/dashboard/Popup";
 import { getUserFilteredById } from "../selectors/usersSelectors";
+import { getCompanies } from "../actions/companiesActions";
+import { getCompanyById } from "../selectors/companiesSelectors";
 
 class UserListPage extends React.Component {
   constructor(props) {
@@ -46,6 +49,7 @@ class UserListPage extends React.Component {
   componentDidMount() {
     this.props.getUsersByCompany(this.props.currentUser.companyId);
     this.props.getChatbotsByCompany(this.props.currentUser.companyId)
+    this.props.getCompanies();
   }
 
   /* eslint-disable */
@@ -133,145 +137,149 @@ class UserListPage extends React.Component {
         marginRight: "3px",
       }
     };
-
-    return (
-      <PageBase
-        title={"Members (" + this.props.userList.length + ")"}
-        navigation="Team"
-      >
-        <div>
+    if (this.props.isFetching || !this.props.company) {
+      return <CircularProgress />;
+    }
+    else
+      return (
+        <PageBase
+          title={"Members (" + this.props.userList.length + ")"}
+          navigation="Team"
+        >
           <div>
-            {
-              this.props.user.companyOwner === true &&
-              <Link to="/user">
-                <FloatingActionButton
-                  backgroundColor="lightblue"
-                  secondary={true}
-                  style={styles.fab}
-                  backgroundColor={pink500}
-                >
-                  <ContentAdd />
-                </FloatingActionButton>
-              </Link>
-            }
-          </div>
+            <div>
+              {
+                this.props.user.companyOwner === true ?
+                  <Link to={this.props.company.premium === false && this.props.userList.length > 2 ? "/subscribe" : "/user"}>
+                    <FloatingActionButton
+                      backgroundColor="lightblue"
+                      secondary={true}
+                      style={styles.fab}
+                      backgroundColor={pink500}
+                    >
+                      <ContentAdd />
+                    </FloatingActionButton>
+                  </Link>
+                : console.log("")
+              }
+            </div>
 
-          <Table
-            fixedHeader={true}
-            fixedFooter={true}
-            selectable={false}
-            multiSelectable={false}
-          >
-            <TableHeader
-              displaySelectAll={false}
-              adjustForCheckbox={false}
-              enableSelectAll={false}
+            <Table
+              fixedHeader={true}
+              fixedFooter={true}
+              selectable={false}
+              multiSelectable={false}
             >
-              <TableRow>
-                <TableHeaderColumn style={styles.columns.star} />
-                <TableHeaderColumn style={styles.columns.logo} />
-                <TableHeaderColumn style={styles.columns.firstName}>
-                  First Name
-                </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.lastName}>
-                  Last Name
-                </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.chatbots}>
-                  Chatbots
-                </TableHeaderColumn>
-                <TableHeaderColumn style={styles.columns.edit}>
-                Edit
-                </TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody
-              displayRowCheckbox={false}
-              deselectOnClickaway={true}
-              showRowHover={false}
-              stripedRows={false}
-            >
-              {this.state.pageOfItems.map(user => (
-                <TableRow key={user.id}>
-                  <TableRowColumn style={styles.columns.star}>
-                    {
-                      user.companyOwner && user.companyOwner === true && (
-                          <img width={30} src={require("../assets/img/star-badge.png")} title={"Company's owner"} />
-                      )
-                    }
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.columns.logo}>
-                    <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.firstName}-${user.lastName}.svg`} title={user.userName} />
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.columns.firstName}>
-                    {user.firstName}
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.columns.lastName}>
-                    {user.lastName}
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.columns.chatbots}>
-                  {
-                    this.props.chatbotList && this.props.chatbotList.map(chatbot => {
-                      if (user.chatbotIds.includes(chatbot.id)) {
-                        return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/gridy/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
-                      }
-                    })
-                  }
-                  </TableRowColumn>
-                      <TableRowColumn style={styles.columns.edit}>
+              <TableHeader
+                displaySelectAll={false}
+                adjustForCheckbox={false}
+                enableSelectAll={false}
+              >
+                <TableRow>
+                  <TableHeaderColumn style={styles.columns.star} />
+                  <TableHeaderColumn style={styles.columns.logo} />
+                  <TableHeaderColumn style={styles.columns.firstName}>
+                    First Name
+                  </TableHeaderColumn>
+                  <TableHeaderColumn style={styles.columns.lastName}>
+                    Last Name
+                  </TableHeaderColumn>
+                  <TableHeaderColumn style={styles.columns.chatbots}>
+                    Chatbots
+                  </TableHeaderColumn>
+                  <TableHeaderColumn style={styles.columns.edit}>
+                  Edit
+                  </TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody
+                displayRowCheckbox={false}
+                deselectOnClickaway={true}
+                showRowHover={false}
+                stripedRows={false}
+              >
+                {this.state.pageOfItems.map(user => (
+                  <TableRow key={user.id}>
+                    <TableRowColumn style={styles.columns.star}>
                       {
-                        (this.props.user.id === user.id || this.props.user.companyOwner === true) && (
-                            <Link to={"/user/" + user.id}>
+                        user.companyOwner && user.companyOwner === true && (
+                            <img width={30} src={require("../assets/img/star-badge.png")} title={"Company's owner"} />
+                        )
+                      }
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.columns.logo}>
+                      <img width={40} src={`https://avatars.dicebear.com/v2/identicon/${user.firstName}-${user.lastName}.svg`} title={user.userName} />
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.columns.firstName}>
+                      {user.firstName}
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.columns.lastName}>
+                      {user.lastName}
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.columns.chatbots}>
+                    {
+                      this.props.chatbotList && this.props.chatbotList.map(chatbot => {
+                        if (user.chatbotIds.includes(chatbot.id)) {
+                          return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/gridy/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
+                        }
+                      })
+                    }
+                    </TableRowColumn>
+                        <TableRowColumn style={styles.columns.edit}>
+                        {
+                          (this.props.user.id === user.id || this.props.user.companyOwner === true) && (
+                              <Link to={"/user/" + user.id}>
+                              <FloatingActionButton
+                                zDepth={0}
+                                mini={true}
+                                style={styles.editButton}
+                                backgroundColor={green400}
+                                iconStyle={styles.editButtonIcon}
+                              >
+                                <ContentCreate />
+                              </FloatingActionButton>
+                            </Link>
+                          )
+                        }
+                        {
+                          this.props.user.companyOwner === true && (
+
                             <FloatingActionButton
                               zDepth={0}
                               mini={true}
-                              style={styles.editButton}
-                              backgroundColor={green400}
-                              iconStyle={styles.editButtonIcon}
+                              backgroundColor={grey200}
+                              iconStyle={styles.deleteButton}
+                              onTouchTap={() => this.onDelete(user.id)}
                             >
-                              <ContentCreate />
+                              <ActionDelete />
                             </FloatingActionButton>
-                          </Link>
-                        )
-                      }
-                      {
-                        this.props.user.companyOwner === true && (
-
-                          <FloatingActionButton
-                            zDepth={0}
-                            mini={true}
-                            backgroundColor={grey200}
-                            iconStyle={styles.deleteButton}
-                            onTouchTap={() => this.onDelete(user.id)}
-                          >
-                            <ActionDelete />
-                          </FloatingActionButton>
-                        )
-                      }
-                      </TableRowColumn>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <div className={"row center-xs"}>
-            <div className={"col-xs-6"}>
-              <div className={"box"}>
-                <Pagination
-                  items={this.props.userList}
-                  onChangePage={this.onChangePage}
-                />
+                          )
+                        }
+                        </TableRowColumn>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <div className={"row center-xs"}>
+              <div className={"col-xs-6"}>
+                <div className={"box"}>
+                  <Pagination
+                    items={this.props.userList}
+                    onChangePage={this.onChangePage}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <Popup
-            dialogText={`Do you want to delete this user ?`}
-            handleClose={(data) => this.handleClose(data)}
-            open={this.state.open}
-            display={false}
-          />
-        </div>
-      </PageBase>
-    );
+            <Popup
+              dialogText={`Do you want to delete this user ?`}
+              handleClose={(data) => this.handleClose(data)}
+              open={this.state.open}
+              display={false}
+            />
+          </div>
+        </PageBase>
+      );
   }
 }
 
@@ -281,6 +289,7 @@ function mapStateToProps(state) {
   return {
     user: getUserFilteredById(state, user.id) || {},
     currentUser: user,
+    company: getCompanyById(state, user.companyId),
     userList: getUserFilteredList(state).sort(function(a, b){
       if(a.firstName.toLowerCase() < b.firstName.toLowerCase()) { return -1; }
       if(a.firstName.toLowerCase() > b.firstName.toLowerCase()) { return 1; }
@@ -303,4 +312,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getUsersByCompany, deleteUsers, getChatbotsByCompany })(UserListPage);
+export default connect(mapStateToProps, { getUsersByCompany, deleteUsers, getChatbotsByCompany, getCompanies })(UserListPage);

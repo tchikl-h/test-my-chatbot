@@ -15,6 +15,7 @@ import TestListPage from "./containers/TestListPage";
 import HistoryListPage from "./containers/HistoryListPage";
 import SignupPage from "./containers/SignupPage";
 import LoginPage from "./containers/LoginPage";
+import SubscribePage from "./containers/SubscribePage";
 
 export default (
   <Route>
@@ -34,6 +35,7 @@ export default (
       <Route path="chatbot/:id/tests" component={TestListPage} />
       <Route path="history" component={HistoryListPage} />
       <Route path="about" component={AboutPage} />
+      <Route path="subscribe" component={SubscribePage} />
       <Route path="*" component={NotFoundPage} />
     </Route>
   </Route>

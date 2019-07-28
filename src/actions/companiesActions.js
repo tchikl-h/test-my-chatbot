@@ -103,7 +103,8 @@ export const postCompanies = (name, description) => (dispatch) =>
       url: `${process.env.API_HOST}/v1/companies`,
       data: {
         companyName: name,
-        companyDescription: "description"
+        companyDescription: "description",
+        premium: false
       }
     })
     .then((res) => {

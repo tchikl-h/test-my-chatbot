@@ -50,6 +50,7 @@ class Chat extends React.Component {
     const {
       chatbot,
     } = this.props;
+    
     if (data.isConfirmed === false) {
       this.setState({ open: false });
     }

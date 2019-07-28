@@ -270,7 +270,7 @@ export const postChatbots = chatbot => (dispatch) =>
       data: {
         projectName: chatbot.project_name,
         description: chatbot.description,
-        containerMode: chatbot.container_mode,
+        //containerMode: chatbot.container_mode,
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,
@@ -298,7 +298,7 @@ export const patchChatbots = chatbot => (dispatch) =>
       data: {
         projectName: chatbot.project_name,
         description: chatbot.description,
-        containerMode: chatbot.container_mode,
+        //containerMode: chatbot.container_mode,
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,

@@ -20,6 +20,8 @@ import Popup from "../components/dashboard/Popup";
 import CircularProgress from "material-ui/CircularProgress";
 import { getUserFilteredById } from "../selectors/usersSelectors";
 import RaisedButton from "material-ui/RaisedButton";
+import { getCompanies } from "../actions/companiesActions";
+import { getCompanyById } from "../selectors/companiesSelectors";
 const io = require("socket.io-client");
 let socket;
 
@@ -51,6 +53,7 @@ class TestListPage extends React.Component {
   }
   
   componentWillMount() {
+    this.props.getCompanies();
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id);
     socket = io.connect(process.env.HOST);
     socket.emit('room', `${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
@@ -175,7 +178,7 @@ class TestListPage extends React.Component {
         marginLeft: "830px"
       }
     };
-    if (!this.props.routeParams || !this.props.chatbot || !this.props.testList || !this.props.user || !this.props.user.chatbotIds)
+    if (!this.props.routeParams || !this.props.chatbot || !this.props.testList || !this.props.user || !this.props.user.chatbotIds || !this.props.company)
       return <CircularProgress />;
     else if (!this.props.user.chatbotIds.includes(parseInt(this.props.routeParams.id))) {
       return (
@@ -190,7 +193,7 @@ class TestListPage extends React.Component {
           <div>
             <h3 style={styles.navigation}>Chatbots / {this.props.chatbot.project_name} / Tests</h3>
             {
-              <Link to={`/chatbot/${this.props.routeParams.id}/test`}>
+              <Link to={this.props.company.premium === false && this.props.testList.length > 9 ? "/subscribe" : `/chatbot/${this.props.routeParams.id}/test`}>
                 <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
                   <ContentAdd />
                 </FloatingActionButton>
@@ -251,6 +254,7 @@ function mapStateToProps(state, ownProps) {
   return {
     user: getUserFilteredById(state, user.id) || {},
     currentUser: user,
+    company: getCompanyById(state, user.companyId),
     testList: getTestFilteredList(state).sort(function(a, b){
       if(a.name < b.name) { return -1; }
       if(a.name > b.name) { return 1; }
@@ -262,4 +266,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany })(TestListPage);
+export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies })(TestListPage);

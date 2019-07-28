@@ -15,6 +15,8 @@ import { getChatbotsByUser } from "../actions/chatbotsActions"
 import { getUsersByCompany } from "../actions/usersActions";
 import CircularProgress from "material-ui/CircularProgress";
 import { getUserFilteredById } from "../selectors/usersSelectors";
+import { getCompanies } from "../actions/companiesActions";
+import { getCompanyById } from "../selectors/companiesSelectors";
 
 class ChatbotListPage extends React.Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class ChatbotListPage extends React.Component {
   componentDidMount() {
     this.props.getChatbotsByUser(this.props.serializedUser.companyId, this.props.serializedUser.id);
     this.props.getUsersByCompany(this.props.serializedUser.companyId);
+    this.props.getCompanies();
   }
 
   render() {
@@ -46,19 +49,20 @@ class ChatbotListPage extends React.Component {
         display: "block"
       }
     };
-    if (!this.props.user || !this.props.chatbotList)
+    if (!this.props.user || !this.props.chatbotList || !this.props.company)
       return <CircularProgress />;
     else {
       return (
         <div>
           <h3 style={styles.navigation}>Chatbots</h3>
           {
-            this.props.user.companyOwner === true &&
-            <Link to="/chatbot">
-              <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
-                <ContentAdd />
-              </FloatingActionButton>
-            </Link>
+            this.props.user.companyOwner === true ?
+              <Link to={this.props.company.premium === false && this.props.chatbotList.length > 0 ? "/subscribe" : "/chatbot"}>
+                <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
+                  <ContentAdd />
+                </FloatingActionButton>
+              </Link>
+            : console.log("")
           }
           <div className="row">
           {
@@ -88,6 +92,7 @@ function mapStateToProps(state) {
   return {
     serializedUser: user,
     user: getUserFilteredById(state, user.id) || {},
+    company: getCompanyById(state, user.companyId),
     chatbotList: getChatbotFilteredByUserList(state).sort(function(a, b){
       if(a.firstName < b.firstName) { return -1; }
       if(a.firstName > b.firstName) { return 1; }
@@ -98,4 +103,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getUsersByCompany, getChatbotsByUser })(ChatbotListPage);
+export default connect(mapStateToProps, { getUsersByCompany, getChatbotsByUser, getCompanies })(ChatbotListPage);

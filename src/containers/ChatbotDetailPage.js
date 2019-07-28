@@ -9,10 +9,14 @@ import { connect } from "react-redux";
 import { typography } from "material-ui/styles";
 import ChatbotBox from "../components/dashboard/ChatbotBox";
 import ChatbotActionBox from "../components/dashboard/ChatbotActionBox";
+import { getTestFilteredList } from "../selectors/testsSelectors";
+import { getTestsByChatbot } from "../actions/testsActions"
 import { getChatbotsByUser, deleteChatbots } from "../actions/chatbotsActions";
 import { getChatbotFilteredById } from "../selectors/chatbotsSelectors";
 import { getUsersByCompany } from "../actions/usersActions";
 import { getUserFilteredList, getUserFilteredById } from "../selectors/usersSelectors";
+import { getCompanies } from "../actions/companiesActions";
+import { getCompanyById } from "../selectors/companiesSelectors";
 import Popup from "../components/dashboard/Popup";
 import CircularProgress from "material-ui/CircularProgress";
 
@@ -25,8 +29,10 @@ class ChatbotDetailPage extends React.Component {
   }
 
   componentDidMount() {
+    this.props.getCompanies();
     this.props.getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id);
     this.props.getUsersByCompany(this.props.currentUser.companyId);
+    this.props.getTestsByChatbot(this.props.params.id);
   }
 
   handleClose(data) {
@@ -54,7 +60,7 @@ class ChatbotDetailPage extends React.Component {
         display: "block"
       }
     };
-    if (!this.props.user || !this.props.chatbot || !this.props.userList)
+    if (!this.props.user || !this.props.chatbot || !this.props.userList || !this.props.company)
       return <CircularProgress />;
     else
       return (
@@ -86,7 +92,7 @@ class ChatbotDetailPage extends React.Component {
               </div>
 
               <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 m-b-15 ">
-                <Link to={`${window.location.href}/test`}>
+                <Link to={this.props.company.premium === false && this.props.testList.length > 9 ? "/subscribe" : `${window.location.href}/test`}>
                   <ChatbotActionBox
                     Icon={require("../assets/img/chat-icon.png")}
                     title={this.props.chatbot.project_name}
@@ -129,6 +135,12 @@ function mapStateToProps(state, ownProps) {
   return {
     user: getUserFilteredById(state, user.id) || {},
     currentUser: user,
+    company: getCompanyById(state, user.companyId),
+    testList: getTestFilteredList(state).sort(function(a, b){
+      if(a.name < b.name) { return -1; }
+      if(a.name > b.name) { return 1; }
+      return 0;
+    }),
     chatbot: getChatbotFilteredById(state, ownProps.params.id),
     userList: getUserFilteredList(state),
     isAuthenticated,
@@ -136,4 +148,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { getChatbotsByUser, deleteChatbots, getUsersByCompany })(ChatbotDetailPage);
+export default connect(mapStateToProps, { getChatbotsByUser, deleteChatbots, getUsersByCompany, getTestsByChatbot, getCompanies })(ChatbotDetailPage);

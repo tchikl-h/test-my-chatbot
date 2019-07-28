@@ -10,9 +10,10 @@ import Formsy from "formsy-react";
 import CircularProgress from "material-ui/CircularProgress";
 import autoBind from "react-autobind";
 import { getChatbotsByUser, postChatbots, patchChatbots } from "../actions/chatbotsActions";
-import { getUsersByCompany } from "../actions/usersActions";
 import { getChatbotFilteredById, getChatbotIsFetching } from "../selectors/chatbotsSelectors";
-import { getUserFilteredById } from "../selectors/usersSelectors";
+import { getCompanies } from "../actions/companiesActions";
+import { getCompanyById } from "../selectors/companiesSelectors";
+import { getChatbotFilteredByUserList } from "../selectors/chatbotsSelectors";
 
 class ChatbotFormPage extends React.Component {
   constructor(props) {
@@ -21,14 +22,14 @@ class ChatbotFormPage extends React.Component {
     this.state = {
       isFetching: this.props.routeParams.id ? true : false, // fetching :id of the chatbot if exists
       chatbot: {
-        companyId: this.props.user.companyId
+        companyId: this.props.currentUser.companyId
       }
     };
   }
 
   componentDidMount() {
-    this.props.getChatbotsByUser(this.props.user.companyId, this.props.user.id);
-    this.props.getUsersByCompany(this.props.user.companyId);
+    this.props.getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id);
+    this.props.getCompanies();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -54,7 +55,7 @@ class ChatbotFormPage extends React.Component {
     else {
       this.props.postChatbots(this.state.chatbot)
       .then(() => {
-        this.props.getChatbotsByUser(this.props.user.companyId, this.props.user.id);
+        this.props.getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id);
         this.props.router.push("/chatbots");
       })
     }
@@ -100,13 +101,12 @@ class ChatbotFormPage extends React.Component {
         marginLeft: 5
       }
     };
-
-    if (isFetching) {
+    if (isFetching || !this.props.company) {
       return <CircularProgress />;
-    } else if (this.props.user.companyOwner !== true) {
+    } else if (this.props.currentUser.companyOwner !== true || !this.props.routeParams.id && this.props.company.premium === false && this.props.chatbotList.length > 0) {
       return (
         <PageBase title="Chatbot" navigation="Chatbots / creation">
-        <p>You don't have the permission to edit this chatbot</p>
+        <p>You don't have the permission to edit this chatbot or to create a new one</p>
         </PageBase>
       )
     } else {
@@ -160,7 +160,7 @@ class ChatbotFormPage extends React.Component {
                 />
               </GridTile>
 
-              <GridTile>
+              {/* <GridTile>
                 <FormsyText
                   hintText="Dialogflow, watson, fbDirect..."
                   floatingLabelText="Container mode"
@@ -180,7 +180,7 @@ class ChatbotFormPage extends React.Component {
                     isDefaultRequiredValue: "This is a required field"
                   }}
                 />
-              </GridTile>
+              </GridTile> */}
 
               <GridTile>
                 <FormsyText
@@ -280,12 +280,18 @@ function mapStateToProps(state, ownProps) {
   const { auth } = state;
   const { isAuthenticated, errorMessage, user } = auth;
   return {
-    user: getUserFilteredById(state, user.id) || {},
+    currentUser: user || {},
     chatbot: getChatbotFilteredById(state, ownProps.params.id) || {},
+    company: getCompanyById(state, user.companyId),
+    chatbotList: getChatbotFilteredByUserList(state).sort(function(a, b){
+      if(a.firstName < b.firstName) { return -1; }
+      if(a.firstName > b.firstName) { return 1; }
+      return 0;
+    }),
     isFetching: getChatbotIsFetching(state),
     isAuthenticated,
     errorMessage,
   };
 }
 
-export default connect(mapStateToProps, { getChatbotsByUser, postChatbots, patchChatbots, getUsersByCompany})(ChatbotFormPage);
+export default connect(mapStateToProps, { getChatbotsByUser, postChatbots, patchChatbots, getCompanies })(ChatbotFormPage);

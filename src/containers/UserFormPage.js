@@ -27,6 +27,7 @@ class UserFormPage extends React.Component {
         lastName: "",
         userName: "",
         password: "",
+        mail: "",
         repassword: "",
         chatbotIds: [],
         companyOwner: false,
@@ -147,7 +148,7 @@ class UserFormPage extends React.Component {
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cellHeight={!this.props.user.id ? 400 : 200}>
+            <GridList cellHeight={!this.props.user.id ? 430 : 230}>
               <GridTile style={{width: "1000px"}}>
                 <div style={styles.container}>
                   <div style={styles.leftBlock}>
@@ -180,6 +181,20 @@ class UserFormPage extends React.Component {
                         isDefaultRequiredValue: "This is a required field"
                       }}
                       value={user.lastName ? user.lastName : ""}
+                      required
+                    />
+
+                    <FormsyText
+                      floatingLabelText="Email"
+                      fullWidth={true}
+                      name="mail"
+                      onChange={this.handleChange}
+                      validations={{ matchRegexp: /^.+@.+\..+$/ }}
+                      validationErrors={{
+                        matchRegexp: "Please provide valid email",
+                        isDefaultRequiredValue: "This is a required field"
+                      }}
+                      value={user.mail ? user.mail : ""}
                       required
                     />
 
@@ -224,9 +239,9 @@ class UserFormPage extends React.Component {
                             />
 
                             <FormsyText
-                              floatingLabelText="Password"
+                              floatingLabelText="Confirm password"
                               fullWidth={true}
-                              name="password"
+                              name="repassword"
                               type="password"
                               onChange={this.handleChange}
                               validationError='Passwords do not match'

@@ -138,6 +138,7 @@ export const postUsers = user => (dispatch) =>
         lastName: user.lastName,
         userName: user.userName,
         password: user.password,
+        mail: user.mail,
         chatbotIds: user.chatbotIds,
         companyOwner: user.companyOwner,
         companyId: user.companyId,
