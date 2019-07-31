@@ -31,6 +31,7 @@ export default class MessageForm extends React.Component {
     }
 
     switchRecord() {
+      this.props.changeRecordStateWithSocket(this.state.isRecording);
       if (this.state.isRecording === true)
         this.props.openSaveTestDialog();
       this.setState({isRecording: !this.state.isRecording});

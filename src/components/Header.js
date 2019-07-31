@@ -3,13 +3,14 @@ import AppBar from "material-ui/AppBar";
 import IconButton from "material-ui/IconButton";
 import Menu from "material-ui/svg-icons/navigation/menu";
 import { white } from "material-ui/styles/colors";
+import Back from "material-ui/svg-icons/navigation/arrow-back";
 // import FlatButton from "material-ui/FlatButton";
 
 
 class Header extends React.Component {
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
   }
 
   render() {
@@ -38,16 +39,11 @@ class Header extends React.Component {
       <div>
         <AppBar
           style={{ ...styles, ...style.appBar }}
-          /*title={ <SearchBox />  }*/
           iconElementLeft={
             <div style={style.iconsLeftContainer}>
-              {/*<img width={35} src="../assets/img/logo_rtk_sm.png" ></img>*/}
-              <IconButton
-                style={style.menuButton}
-                onClick={handleChangeRequestNavDrawer}
-              >
-                <Menu color={white} />
-              </IconButton>
+              <div onClick={() => this.props.router.goBack()}>
+                <Back color="white" style={{height: "30px", width: "30px", marginTop: "8px"}}/>
+              </div>
             </div>
           }
           iconElementRight={

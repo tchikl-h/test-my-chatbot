@@ -4,7 +4,6 @@ import RaisedButton from "material-ui/RaisedButton";
 import PageBase from "../components/PageBase";
 import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
-
 import { FormsyText } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import CircularProgress from "material-ui/CircularProgress";
@@ -14,6 +13,7 @@ import { getChatbotFilteredById, getChatbotIsFetching } from "../selectors/chatb
 import { getCompanies } from "../actions/companiesActions";
 import { getCompanyById } from "../selectors/companiesSelectors";
 import { getChatbotFilteredByUserList } from "../selectors/chatbotsSelectors";
+
 
 class ChatbotFormPage extends React.Component {
   constructor(props) {
@@ -75,12 +75,10 @@ class ChatbotFormPage extends React.Component {
       if (typeof date === "object") {
         let chatbot = Object.assign({}, chatbot);
         this.setState({ chatbot: chatbot });
-        this.enableButton();
       } else if (event && event.target && field) {
         let _chatbot = Object.assign({}, chatbot);
         _chatbot[field] = event.target.value;
         this.setState({ chatbot: _chatbot });
-        this.enableButton();
       }
     }
   }
@@ -136,6 +134,7 @@ class ChatbotFormPage extends React.Component {
                   validationErrors={{
                     isDefaultRequiredValue: "This is a required field"
                   }}
+                  required
                 />
               </GridTile>
 
@@ -157,6 +156,7 @@ class ChatbotFormPage extends React.Component {
                   validationErrors={{
                     isDefaultRequiredValue: "This is a required field"
                   }}
+                  required
                 />
               </GridTile>
 
@@ -184,7 +184,7 @@ class ChatbotFormPage extends React.Component {
 
               <GridTile>
                 <FormsyText
-                  hintText="567898765"
+                  hintText="jojo-owvrog"
                   floatingLabelText="Dialogflow project ID"
                   name="dialogflow_project_id"
                   onChange={this.handleChange}
@@ -200,12 +200,13 @@ class ChatbotFormPage extends React.Component {
                   validationErrors={{
                     isDefaultRequiredValue: "This is a required field"
                   }}
+                  required
                 />
               </GridTile>
 
               <GridTile>
                 <FormsyText
-                  hintText="john@doe.com"
+                  hintText="test-my-chatbot-322@jojo-owvrog.iam.gserviceaccount.com"
                   floatingLabelText="Dialogflow client email"
                   name="dialogflow_client_email"
                   onChange={this.handleChange}
@@ -221,12 +222,13 @@ class ChatbotFormPage extends React.Component {
                   validationErrors={{
                     isDefaultRequiredValue: "This is a required field"
                   }}
+                  required
                 />
               </GridTile>
 
               <GridTile>
                 <FormsyText
-                  hintText="5tuG2IUAG5sAlkay8tjG7"
+                  hintText="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCYI..."
                   floatingLabelText="Dialogflow private key"
                   name="dialogflow_private_key"
                   onChange={this.handleChange}
@@ -242,6 +244,7 @@ class ChatbotFormPage extends React.Component {
                   validationErrors={{
                     isDefaultRequiredValue: "This is a required field"
                   }}
+                  required
                 />
               </GridTile>
             </GridList>
@@ -249,6 +252,15 @@ class ChatbotFormPage extends React.Component {
             <div style={styles.buttons}>
               <Link to={this.state.chatbot.id ? `/chatbot/${this.state.chatbot.id}` : "/chatbots"}>
                 <RaisedButton label="Cancel" />
+              </Link>
+
+              <Link to="chart" target="_blank" to="https://www.youtube.com/watch?v=6E2EgdXsgXU">
+                <RaisedButton
+                  label="Help"
+                  variant="contained"
+                  style={styles.saveButton}
+                  type="button"
+                />
               </Link>
 
               <RaisedButton

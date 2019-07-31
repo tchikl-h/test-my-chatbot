@@ -113,6 +113,17 @@ class Chat extends React.Component {
     });
   }
 
+  changeRecordStateWithSocket(isRecording) {
+    if (isRecording === true) {
+      console.log("changeRecordStateWithSocket stop:recording")
+      socket.emit('stop:recording');
+    }
+    else {
+      console.log("changeRecordStateWithSocket start:recording")
+      socket.emit('start:recording');
+    }
+  }
+
   render() {
     const {
       chatbot,
@@ -128,6 +139,7 @@ class Chat extends React.Component {
           onMessageSubmit={this.messageSend} 
           statusRecord={(isRecording) => this.statusRecord(isRecording)}
           openSaveTestDialog={() => this.handleOpen()}
+          changeRecordStateWithSocket={(isRecording) => this.changeRecordStateWithSocket(isRecording)}
         />
         <Popup
           dialogText={`What is the name of your test ?`}

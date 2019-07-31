@@ -104,6 +104,7 @@ class App extends React.Component {
             !isFetching && (
               <div>
                 <Header
+                  {...this.props}
                   styles={styles.header}
                   handleChangeRequestNavDrawer={this.handleChangeRequestNavDrawer.bind(
                     this
@@ -118,7 +119,7 @@ class App extends React.Component {
                   onLogoutClick={() => dispatch(logoutUser())}
                   user={this.props.user}
                 />
-z
+
                 <div style={styles.container}>{this.props.children}</div>
               </div>
             )}

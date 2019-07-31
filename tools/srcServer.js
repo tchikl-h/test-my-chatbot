@@ -68,6 +68,17 @@ io.sockets.on('connection', function(socket) {
     console.log("Server : on.room "+room);
       socket.join(room, () => {
         console.log("Server : joined room "+room);
+
+        socket.in(room).on('start:recording', function() {
+          console.log("srcServer start:recording")
+          io.sockets.in(room).emit('start:recording');
+        });
+
+        socket.in(room).on('stop:recording', function() {
+          console.log("srcServer stop:recording")
+          io.sockets.in(room).emit('stop:recording');
+        });
+
         // 1) receive bot
         socket.in(room).on('send:message:bot', function(data) {
           console.log("Server : on.send:message:bot on room "+room);

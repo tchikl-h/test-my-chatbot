@@ -6,6 +6,7 @@ import {
   pink500,
   grey600,
   grey200,
+  grey400,
 } from "material-ui/styles/colors";
 import { connect } from "react-redux";
 import { typography } from "material-ui/styles";
@@ -154,6 +155,15 @@ class TestListPage extends React.Component {
         position: "fixed",
         marginRight: 20
       },
+      back: {
+        // margin: 0,
+        top: "auto",
+        right: 20,
+        bottom: 20,
+        right: "auto",
+        position: "fixed",
+        marginLeft: 20
+      },
       navigation: {
         fontSize: 15,
         fontWeight: typography.fontWeightLight,
@@ -193,11 +203,17 @@ class TestListPage extends React.Component {
           <div>
             <h3 style={styles.navigation}>Chatbots / {this.props.chatbot.project_name} / Tests</h3>
             {
-              <Link to={this.props.company.premium === false && this.props.testList.length > 9 ? "/subscribe" : `/chatbot/${this.props.routeParams.id}/test`}>
-                <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
-                  <ContentAdd />
-                </FloatingActionButton>
-              </Link>
+              <div>
+                {/* <FloatingActionButton style={styles.back} backgroundColor={grey400} onClick={() => this.props.router.goBack()}>
+                  <Back />
+                </FloatingActionButton> */}
+
+                <Link to={this.props.company.premium === false && this.props.testList.length > 9 ? "/subscribe" : `/chatbot/${this.props.routeParams.id}/test`}>
+                  <FloatingActionButton style={styles.fab} backgroundColor={pink500}>
+                    <ContentAdd />
+                  </FloatingActionButton>
+                </Link>
+              </div>
             }
             <section class="container">
               <div style={styles.leftBlock}>
