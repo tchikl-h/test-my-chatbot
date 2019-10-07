@@ -8,6 +8,9 @@ services:
     container_name: dashboard.test-my-chatbot.com
     restart: on-failure
     environment:
+      - VIRTUAL_HOST=dashboard.test-my-chatbot.com
+      - LETSENCRYPT_HOST=dashboard.test-my-chatbot.com
+      - LETSENCRYPT_EMAIL=herve.tchikladze@epitech.eu
       - NODE_ENV=production
     volumes:
        - ${REPO_PATH}/test-my-chatbot:/src
