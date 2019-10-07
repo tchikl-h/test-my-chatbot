@@ -17,7 +17,7 @@ services:
     # port make it available outside the container AND server
     ports:
       - "3007:8080"
-    command: bash -c "npm run prod"
+    command: bash -c "npm install && npm run build && npm run prod"
     networks:
       - default
 
