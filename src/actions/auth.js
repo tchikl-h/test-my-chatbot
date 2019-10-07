@@ -9,6 +9,8 @@ import {
 } from "./actionTypes";
 import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = process.env.ADMIN_TOKEN;
+
 // Login actions
 
 function requestLogin() {
@@ -61,6 +63,7 @@ export function loginUser(user) {
       else
         dispatch(invalidateLogin());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -75,6 +78,7 @@ export function loginUserWithToken(token) {
       else
         dispatch(invalidateToken());
     })
+    .catch(err => console.log(err));
   }
 }
 

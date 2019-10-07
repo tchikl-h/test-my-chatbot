@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "npm-run-all --parallel open:src",
+    "prod": "node server.js",
     "demo": "npm-run-all --parallel test:watch open:src lint:watch",
     "open:src": "babel-node tools/srcServer.js",
     "open:dist": "babel-node tools/distServer.js",
@@ -44,6 +45,7 @@
     "history": "4.5.1",
     "lodash": "4.17.11",
     "material-ui": "0.19.4",
+    "nodemailer": "6.3.0",
     "query-string": "6.6.0",
     "react": "15.4.2",
     "react-autobind": "1.0.6",

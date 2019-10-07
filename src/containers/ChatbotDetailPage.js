@@ -42,6 +42,7 @@ class ChatbotDetailPage extends React.Component {
       .then(() => {
         this.props.router.push("/chatbots");
       })
+      .catch(err => console.log(err));
     }
   }
 

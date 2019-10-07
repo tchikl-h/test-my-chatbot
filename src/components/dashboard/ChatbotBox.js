@@ -69,7 +69,7 @@ class ChatbotBox extends React.Component {
     return (
       <Paper style={styles.paperSize}>
         <span style={styles.iconSpan}>
-          <img style={styles.icon} src={`https://avatars.dicebear.com/v2/gridy/${title}.svg`} />
+          <img style={styles.icon} src={`https://avatars.dicebear.com/v2/bottts/${title}.svg`} />
         </span>
 
         {

@@ -19,6 +19,11 @@ class Popup extends React.Component {
     this.setState({ description : e.target.value });
   }
 
+  resetState() {
+    this.setState({name: ""});
+    this.setState({description: ""});
+  }
+
   render() {
     const { dialogText } = this.props;
 
@@ -49,7 +54,7 @@ class Popup extends React.Component {
         label="Confirm"
         primary={true}
         value={true}
-        onTouchTap={() => this.props.handleClose({isConfirmed: true, name: this.state.name, description: this.state.description})}
+        onTouchTap={() => this.props.handleClose({isConfirmed: true, name: this.state.name, description: this.state.description}, this.resetState())}
       />
     ];
 

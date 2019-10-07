@@ -6,6 +6,8 @@ import {
 } from "./actionTypes";
 import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = process.env.ADMIN_TOKEN;
+
 export function requestGetCompanies() {
   return {
     type: REQUEST_GET_COMPANIES,
@@ -90,20 +92,19 @@ export function getCompanies() {
       else
         dispatch(invalidateGetCompanies());
     })
+    .catch(err => console.log(err));
   }
 }
 
 export const postCompanies = (name, description) => (dispatch) =>
   new Promise(function(resolve, reject) {
-    console.log(name);
-    console.log(description);
     dispatch(requestPostCompanies());
     return axios({
       method: 'post',
       url: `${process.env.API_HOST}/v1/companies`,
       data: {
         companyName: name,
-        companyDescription: "description",
+        companyDescription: description,
         premium: false
       }
     })
@@ -116,18 +117,18 @@ export const postCompanies = (name, description) => (dispatch) =>
         dispatch(invalidatePostCompanies());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const patchCompanies = (id, name, description) => (dispatch) =>
   new Promise(function(resolve, reject) {
-    console.log(description);
     dispatch(requestPatchCompanies());
     return axios({
       method: 'patch',
       url: `${process.env.API_HOST}/v1/companies/${id}`,
       data: {
         companyName: name,
-        companyDescription: "description"
+        companyDescription: description
       }
     })
     .then((res) => {
@@ -139,6 +140,7 @@ export const patchCompanies = (id, name, description) => (dispatch) =>
         dispatch(invalidatePatchCompanies());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const deleteCompanies = id => (dispatch) =>
@@ -157,4 +159,5 @@ export const deleteCompanies = id => (dispatch) =>
         dispatch(invalidateDeleteCompanies());
         reject();
     })
+    .catch(err => console.log(err));
   });

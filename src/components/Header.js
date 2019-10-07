@@ -1,8 +1,5 @@
 import React, { PropTypes } from "react";
 import AppBar from "material-ui/AppBar";
-import IconButton from "material-ui/IconButton";
-import Menu from "material-ui/svg-icons/navigation/menu";
-import { white } from "material-ui/styles/colors";
 import Back from "material-ui/svg-icons/navigation/arrow-back";
 // import FlatButton from "material-ui/FlatButton";
 
@@ -14,7 +11,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { styles, handleChangeRequestNavDrawer } = this.props;
+    const { styles } = this.props;
 
     const style = {
       appBar: {

@@ -114,7 +114,7 @@ class TestBox extends React.Component {
                   <img style={styles.resultIcon} src={require(`../../assets/img/success.png`)} />
                   : <img style={styles.resultIcon} src={require(`../../assets/img/fail.png`)} />
               : <CircularProgress style={styles.resultIcon} />
-            : console.log("NOTHING")
+            : console.log("")
           }
         </div>
       </Paper>

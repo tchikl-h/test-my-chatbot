@@ -11,6 +11,8 @@ import {
 } from "./actionTypes";
 import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = process.env.ADMIN_TOKEN;
+
 export function requestGetChatbots() {
   return {
     type: REQUEST_GET_CHATBOTS,
@@ -190,6 +192,7 @@ export function startChatbot(companyId, userId, chatbotId) {
       else
         dispatch(invalidateStartChatbots());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -204,6 +207,7 @@ export function stopChatbot(companyId, userId, chatbotId) {
       else
         dispatch(invalidateStopChatbots());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -218,6 +222,7 @@ export function launchChatbot(companyId, userId, chatbotId) {
       else
         dispatch(invalidateLaunchChatbots());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -232,6 +237,7 @@ export function getChatbots() {
       else
         dispatch(invalidateGetChatbots());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -245,6 +251,7 @@ export function getChatbotsByCompany(id) {
       else
         dispatch(invalidateGetChatbotsByCompany());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -258,6 +265,7 @@ export function getChatbotsByUser(companyId, userId) {
       else
         dispatch(invalidateGetChatbotsByUser());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -274,7 +282,8 @@ export const postChatbots = chatbot => (dispatch) =>
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,
-        companyId: chatbot.companyId
+        companyId: chatbot.companyId,
+        periodicBuild: chatbot.periodic_build
       }
     })
     .then((res) => {
@@ -287,6 +296,7 @@ export const postChatbots = chatbot => (dispatch) =>
         reject();
       }
     })
+    .catch(err => console.log(err));
   });
 
 export const patchChatbots = chatbot => (dispatch) =>
@@ -302,7 +312,8 @@ export const patchChatbots = chatbot => (dispatch) =>
         dialogflowProjectId: chatbot.dialogflow_project_id,
         dialogflowClientEmail: chatbot.dialogflow_client_email,
         dialogflowPrivateKey: chatbot.dialogflow_private_key,
-        companyId: chatbot.companyId
+        companyId: chatbot.companyId,
+        periodicBuild: chatbot.periodic_build
       }
     })
     .then((res) => {
@@ -314,6 +325,7 @@ export const patchChatbots = chatbot => (dispatch) =>
         dispatch(invalidatePatchChatbots());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const deleteChatbots = id => (dispatch) =>
@@ -332,4 +344,5 @@ export const deleteChatbots = id => (dispatch) =>
         dispatch(invalidateDeleteChatbots());
         reject();
     })
+    .catch(err => console.log(err));
   });

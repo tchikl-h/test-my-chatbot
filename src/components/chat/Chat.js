@@ -31,10 +31,8 @@ class Chat extends React.Component {
       chatbot,
     } = this.props;
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, chatbot.id);
-    console.log("User : on.connect");
     // Connected, let's sign-up for to receive messages for this room
-    console.log("User : emit.room "+this.props.user.companyId+"-"+chatbot.id+"-"+this.props.user.id);
-    socket.emit('room', `${this.props.user.companyId}-${chatbot.id}-${this.props.user.id}`);
+    socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${chatbot.id}-${this.props.user.id}`);
     // 3) receive user
     socket.on('send:message:user', this.messageReceive);
     // 3) receive bot
@@ -42,11 +40,10 @@ class Chat extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log("Closing socket !");
     socket.close();
   }
 
-  handleClose(data) {
+  handleClose(data, resetState) {
     const {
       chatbot,
     } = this.props;
@@ -70,7 +67,9 @@ class Chat extends React.Component {
         newMessages.push( { 'text' : `Test \"${data.name}\" has been added successfully`} );
         this.setState( {messages : newMessages} );
       })
+      .catch(err => console.log(err));
     }
+    resetState();
   }
 
   handleOpen() {
@@ -87,8 +86,6 @@ class Chat extends React.Component {
   }
 
   messageReceive(data) {
-    console.log("User : on.send:message:user");
-    console.log(data.msg);
     let newMessages = this.state.messages;
     newMessages.push(data.msg);
     // newMessages.push(data);
@@ -97,8 +94,6 @@ class Chat extends React.Component {
   }
 
   messageReceivedByBot(data) {
-    console.log("User : on.send:message:bot");
-    console.log(data.msg);
     let newMessages = this.state.messages;
     newMessages.push(data.msg);
     this.setState( {messages : newMessages} );
@@ -107,7 +102,6 @@ class Chat extends React.Component {
 
   messageSend(message) {
     // 0) send user
-    console.log("User : emit.send:message:user")
     socket.emit('send:message:user', {
       msg: message
     });
@@ -115,11 +109,9 @@ class Chat extends React.Component {
 
   changeRecordStateWithSocket(isRecording) {
     if (isRecording === true) {
-      console.log("changeRecordStateWithSocket stop:recording")
       socket.emit('stop:recording');
     }
     else {
-      console.log("changeRecordStateWithSocket start:recording")
       socket.emit('start:recording');
     }
   }
@@ -143,7 +135,7 @@ class Chat extends React.Component {
         />
         <Popup
           dialogText={`What is the name of your test ?`}
-          handleClose={(data) => this.handleClose(data)}
+          handleClose={(data, resetState) => this.handleClose(data, resetState)}
           open={this.state.open}
           display={true}
         />

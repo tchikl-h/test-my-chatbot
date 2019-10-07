@@ -88,6 +88,7 @@ class UserListPage extends React.Component {
       .then(() => {
         this.props.getUsersByCompany(this.props.user.companyId);
       })
+      .catch(err => console.log(err));
       this.setState({ userId: null });
     }
   }
@@ -220,7 +221,7 @@ class UserListPage extends React.Component {
                     {
                       this.props.chatbotList && this.props.chatbotList.map(chatbot => {
                         if (user.chatbotIds.includes(chatbot.id)) {
-                          return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/gridy/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
+                          return (<img style={styles.avatar} width={40} src={`https://avatars.dicebear.com/v2/bottts/${chatbot.project_name}.svg`} title={chatbot.project_name} />)
                         }
                       })
                     }

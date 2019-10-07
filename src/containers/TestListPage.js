@@ -6,7 +6,6 @@ import {
   pink500,
   grey600,
   grey200,
-  grey400,
 } from "material-ui/styles/colors";
 import { connect } from "react-redux";
 import { typography } from "material-ui/styles";
@@ -17,6 +16,7 @@ import { getChatbotFilteredById } from "../selectors/chatbotsSelectors";
 import { getChatbotsByUser, launchChatbot, startChatbot } from "../actions/chatbotsActions";
 import { getUsersByCompany } from "../actions/usersActions";
 import { getTestsByChatbot, deleteTests } from "../actions/testsActions"
+import { postLogs } from "../actions/logsActions"
 import Popup from "../components/dashboard/Popup";
 import CircularProgress from "material-ui/CircularProgress";
 import { getUserFilteredById } from "../selectors/usersSelectors";
@@ -57,8 +57,7 @@ class TestListPage extends React.Component {
     this.props.getCompanies();
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id);
     socket = io.connect(process.env.HOST);
-    socket.emit('room', `${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
-    console.log(`Entered room ${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
+    socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
     socket.on('logs', (test) => this.updateTestList(test));
   }
 
@@ -82,7 +81,6 @@ class TestListPage extends React.Component {
   }
 
   updateTestList(data) {
-    console.log(data);
     // TODO: tests need to be in the same order as on jasmine
     for(let i = 0; i < this.state.testList.length; i++) {
       if (this.state.testList[i].completed === false) { // next test to be completed
@@ -90,17 +88,12 @@ class TestListPage extends React.Component {
         testList[i].completed = true;
         testList[i].result = data.test.result;
         testList[i].logs = data.test.logs;
-        console.log(testList[i].completed);
-        console.log(true);
-        console.log(testList[i].result);
-        console.log(1);
         if (i === this.state.testList.length - 1) {
           this.setState({launchTestsButtonDisabled: false});
         }
         if (testList[i].completed === true && testList[i].result === 1) {
-          console.log("OUPS, LITTLE PROBLEMO !");
-          console.log(testList[i]);
           this.setState({testError: testList[i]});
+          this.props.postLogs(data.test.logs, "0/0", this.props.chatbot.id);
         }
         this.setState({ testList: testList });
         return;
@@ -109,13 +102,13 @@ class TestListPage extends React.Component {
   }
 
   handleClose(data) {
-    console.log(this.props.testList);
     this.setState({ open: false });
     if (data.isConfirmed && this.state.id && this.props.currentUser) {
       this.props.deleteTests(this.props.currentUser.id, this.state.id)
       .then(() => {
         this.props.getTestsByChatbot(this.props.params.id);
       })
+      .catch(err => console.log(err));
       this.setState({ id: null });
     }
   }
@@ -139,7 +132,8 @@ class TestListPage extends React.Component {
         this.resetTestList();
         this.setState({launchTestsButtonDisabled: true});
         this.setState({testLaunchedAtLeastOnce: true});
-      });
+      })
+      .catch(err => console.log(err));
     }
   }
 
@@ -158,7 +152,6 @@ class TestListPage extends React.Component {
       back: {
         // margin: 0,
         top: "auto",
-        right: 20,
         bottom: 20,
         right: "auto",
         position: "fixed",
@@ -282,4 +275,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies })(TestListPage);
+export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies, postLogs })(TestListPage);

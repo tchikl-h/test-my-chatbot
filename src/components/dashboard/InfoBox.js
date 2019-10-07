@@ -42,7 +42,7 @@ class InfoBox extends React.Component {
     return (
       <Paper>
         <span style={styles.iconSpan}>
-        <img style={styles.icon} src={`https://avatars.dicebear.com/v2/gridy/${title}.svg`} />
+        <img style={styles.icon} src={`https://avatars.dicebear.com/v2/bottts/${title}.svg`} />
         </span>
 
         <div style={styles.content}>

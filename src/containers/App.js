@@ -44,7 +44,6 @@ class App extends React.Component {
       dispatch,
     } = this.props;
     // TODO: currentUser empty
-    // console.log(this.props.currentUser)
     dispatch(getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id));
       // Activate the event listener
       this.setupBeforeUnloadListener();
@@ -112,6 +111,7 @@ class App extends React.Component {
                 />
 
                 <LeftDrawer
+                  {...this.props}
                   navDrawerOpen={navDrawerOpen}
                   menus={Data.menus}
                   signOutMenus={Data.signOutMenus}

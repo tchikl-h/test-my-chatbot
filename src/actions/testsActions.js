@@ -7,6 +7,8 @@ import {
 } from "./actionTypes";
 import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = process.env.ADMIN_TOKEN;
+
 export function requestGetTests() {
   return {
     type: REQUEST_GET_TESTS,
@@ -111,6 +113,7 @@ export function getTests() {
       else
         dispatch(invalidateGetTests());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -124,6 +127,7 @@ export function getTestsByChatbot(id) {
       else
         dispatch(invalidateGetTestsByChatbot());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -148,6 +152,7 @@ export const postTests = (name, description, chatbotId) => (dispatch) =>
         dispatch(invalidatePostTests());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const patchTests = (id, name, description, chatbotId) => (dispatch) =>
@@ -171,6 +176,7 @@ export const patchTests = (id, name, description, chatbotId) => (dispatch) =>
         dispatch(invalidatePatchTests());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const deleteTests = (userId, testId) => (dispatch) =>
@@ -190,4 +196,5 @@ export const deleteTests = (userId, testId) => (dispatch) =>
         reject();
       }
     })
+    .catch(err => console.log(err));
   });

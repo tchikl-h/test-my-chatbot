@@ -95,7 +95,11 @@ class LeftDrawer extends React.Component {
                 leftIcon={<SettingsPower />}
                 onClick={event => this.handleClick(event)}
               />
-              <MenuItem primaryText="Change password" leftIcon={<VpnKey />} />
+              <MenuItem
+                primaryText="Change password"
+                leftIcon={<VpnKey />}
+                onClick={() => this.props.router.push("/password")}
+              />
             </IconMenu>
           </span>
         </div>

@@ -57,7 +57,6 @@ server.listen(port, '0.0.0.0', function onStart(err) {
 });
 
 function shutDown() {
-  console.log("distServer");
   // console.log('Received kill signal, shutting down gracefully');
   // io.emit('disconnect');
   process.exit(0);
@@ -71,34 +70,26 @@ io.on('connect', function(socket){
   socket.on('user:request', () => {
     userCount++;
     socket.emit('user:accept', { id : userId, users : userCount });
-    console.log("before userId : "+userId);
     userId++;
-    console.log("after userId : "+userId);
     socket.broadcast.emit('user:join');
-    console.log("someone joined");
   });
 
   // 1) receive bot
   socket.on('send:message:bot', function(msg) {
     // 2) send bot
     io.emit('send:message:bot', msg);
-    console.log(" => " + msg.text);
   });
 
   // 1) receive user
   socket.on('send:message', function(msg) {
     // 2) send user
     io.emit('send:message', msg);
-    console.log(" => " + msg.text);
   });
 
   socket.on('disconnect', function(msg) {
     socket.broadcast.emit('user:left', msg);
     userCount--;
-    console.log("before userId : "+userId);
     if (userId > 0)
       userId--;
-    console.log("after userId : "+userId);
-    console.log("someone left");
   })
 });

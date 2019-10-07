@@ -1,0 +1,24 @@
+version: "3.5"
+
+services:
+  test_my_chatbot_dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "localhost:3005"
+    restart: on-failure
+    environment:
+      - NODE_ENV=development
+    volumes:
+       - ${REPO_PATH}/test-my-chatbot:/src
+    # port make it available outside the container AND server
+    ports:
+      - "3005:8080"
+    command: bash -c "npm run prod"
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: webproxy

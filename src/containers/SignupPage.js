@@ -72,12 +72,13 @@ class SignupPage extends React.Component {
     .then((company) => {
         let user = Object.assign({}, this.state.user);
         user.companyId = company.id;
-        console.log(user);
         this.props.postUsers(user)
         .then((user) => {
           this.props.onLoginClick(user);
         })
+        .catch(err => console.log(err));
     })
+    .catch(err => console.log(err));
   }
 
   handleChangeUser(event) {

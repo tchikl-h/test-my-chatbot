@@ -2,6 +2,7 @@ import React, { PropTypes } from "react";
 import { Link } from "react-router";
 import RaisedButton from "material-ui/RaisedButton";
 import PageBase from "../components/PageBase";
+// import { FormControl, InputLabel,Select, MenuItem } from '@material-ui/core';
 import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
 import { FormsyText } from "formsy-material-ui/lib";
@@ -50,7 +51,8 @@ class ChatbotFormPage extends React.Component {
       this.props.patchChatbots(this.state.chatbot)
       .then(() => {
         this.props.router.push("/chatbots");
-      });
+      })
+      .catch(err => console.log(err));
     }
     else {
       this.props.postChatbots(this.state.chatbot)
@@ -58,6 +60,7 @@ class ChatbotFormPage extends React.Component {
         this.props.getChatbotsByUser(this.props.currentUser.companyId, this.props.currentUser.id);
         this.props.router.push("/chatbots");
       })
+      .catch(err => console.log(err));
     }
   }
 
@@ -71,6 +74,7 @@ class ChatbotFormPage extends React.Component {
     const field = event ? event.target.name : null;
     const { chatbot } = this.state;
 
+    this.enableButton();
     if (chatbot) {
       if (typeof date === "object") {
         let chatbot = Object.assign({}, chatbot);
@@ -247,6 +251,37 @@ class ChatbotFormPage extends React.Component {
                   required
                 />
               </GridTile>
+
+              <GridTile>
+                <FormsyText
+                  hintText="1"
+                  floatingLabelText="Periodic build (in hours)"
+                  name="periodic_build"
+                  onChange={this.handleChange}
+                  fullWidth={true}
+                  value={
+                    chatbot.periodic_build
+                      ? chatbot.periodic_build
+                      : ""
+                  }
+                />
+              </GridTile>
+
+              {/* <FormControl className={classes.formControl}>
+                <InputLabel>cron (in hours)</InputLabel>
+                <Select
+                  // value={values.age}
+                  // onChange={handleChange}
+                  // inputProps={{
+                  //   name: 'age',
+                  //   id: 'age-simple',
+                  // }}
+                >
+                  <MenuItem value={10}>Ten</MenuItem>
+                  <MenuItem value={20}>Twenty</MenuItem>
+                  <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+              </FormControl> */}
             </GridList>
 
             <div style={styles.buttons}>

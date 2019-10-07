@@ -2,7 +2,6 @@ import React from "react";
 import { Route, IndexRoute } from "react-router";
 import App from "./containers/App";
 import NotFoundPage from "./containers/NotFoundPage.js";
-import Dashboard from "./containers/DashboardPage";
 import AboutPage from "./containers/AboutPage";
 import UserListPage from "./containers/UserListPage";
 import UserFormPage from "./containers/UserFormPage";
@@ -16,12 +15,13 @@ import HistoryListPage from "./containers/HistoryListPage";
 import SignupPage from "./containers/SignupPage";
 import LoginPage from "./containers/LoginPage";
 import SubscribePage from "./containers/SubscribePage";
+import ChangePasswordPage from "./containers/ChangePasswordPage";
 
 export default (
   <Route>
     <Route path="/" component={App}>
-      <IndexRoute component={Dashboard} />
-      <Route path="dashboard" component={Dashboard} />
+      <IndexRoute component={ChatbotListPage} />
+      {/* <Route path="dashboard" component={Dashboard} /> */}
       <Route path="signup" component={SignupPage} />
       <Route path="login" component={LoginPage} />
       <Route path="users" component={UserListPage} />
@@ -36,6 +36,7 @@ export default (
       <Route path="history" component={HistoryListPage} />
       <Route path="about" component={AboutPage} />
       <Route path="subscribe" component={SubscribePage} />
+      <Route path="password" component={ChangePasswordPage} />
       <Route path="*" component={NotFoundPage} />
     </Route>
   </Route>

@@ -7,6 +7,8 @@ import {
 } from "./actionTypes";
 import axios from "axios";
 
+axios.defaults.headers.common['Authorization'] = process.env.ADMIN_TOKEN;
+
 export function requestGetUsers() {
   return {
     type: REQUEST_GET_USERS,
@@ -111,6 +113,7 @@ export function getUsers() {
       else
         dispatch(invalidateGetUsers());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -124,6 +127,7 @@ export function getUsersByCompany(id) {
       else
         dispatch(invalidateGetUsersByCompany());
     })
+    .catch(err => console.log(err));
   }
 }
 
@@ -153,6 +157,7 @@ export const postUsers = user => (dispatch) =>
         dispatch(invalidatePostUsers());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const patchUsers = user => (dispatch) =>
@@ -165,7 +170,7 @@ export const patchUsers = user => (dispatch) =>
         firstName: user.firstName,
         lastName: user.lastName,
         chatbotIds: user.chatbotIds,
-        companyId: user.companyId,
+        mail: user.mail,
       }
     })
     .then((res) => {
@@ -177,6 +182,7 @@ export const patchUsers = user => (dispatch) =>
         dispatch(invalidatePatchUsers());
         reject();
     })
+    .catch(err => console.log(err));
   });
 
 export const deleteUsers = id => (dispatch) =>
@@ -195,4 +201,5 @@ export const deleteUsers = id => (dispatch) =>
         dispatch(invalidateDeleteUsers());
         reject();
     })
+    .catch(err => console.log(err));
   });

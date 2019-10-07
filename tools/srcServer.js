@@ -56,56 +56,44 @@ server.listen(port, '0.0.0.0', function onStart(err) {
 });
 
 function shutDown() {
-  console.log("srcServer");
   // console.log('Received kill signal, shutting down gracefully');
   // io.emit('disconnect');
   process.exit(0);
 }
 
 io.sockets.on('connection', function(socket) {
-  console.log("Server : on.connection");
   socket.on('room', function(room) {
-    console.log("Server : on.room "+room);
       socket.join(room, () => {
-        console.log("Server : joined room "+room);
 
         socket.in(room).on('start:recording', function() {
-          console.log("srcServer start:recording")
           io.sockets.in(room).emit('start:recording');
         });
 
         socket.in(room).on('stop:recording', function() {
-          console.log("srcServer stop:recording")
           io.sockets.in(room).emit('stop:recording');
         });
 
         // 1) receive bot
         socket.in(room).on('send:message:bot', function(data) {
-          console.log("Server : on.send:message:bot on room "+room);
           // 2) send bot
           io.sockets.in(room).emit('send:message:bot', {
             msg: data.msg
           });
-          console.log(" => " + data.msg.text);
         });
 
         socket.in(room).on('logs', function(data) {
-          console.log("Server : on.logs on room "+room);
           // 2) send bot
           io.sockets.in(room).emit('logs', {
             test: data
           });
-          console.log(data);
         });
       
         // 1) receive user
         socket.in(room).on('send:message:user', function(data) {
-          console.log("Server : on.send:message:user on room "+room);
           // 2) send user
           io.sockets.in(room).emit('send:message:user', {
             msg: data.msg
           });
-          console.log(" => " + data.msg.text);
           // TODO : add else "oups could not make chatbot connection"
         });
       });

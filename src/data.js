@@ -8,7 +8,7 @@ import ChevronRight from "material-ui/svg-icons/navigation/chevron-right";
 
 const data = {
   menus: [
-    { text: "Dashboard", icon: <img src={require("./assets/menu-logo/dashboard-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
+    // { text: "Dashboard", icon: <img src={require("./assets/menu-logo/dashboard-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/dashboard" },
     { text: "Chatbots", icon: <img src={require("./assets/menu-logo/robot-logo.svg")} svgStyle={{ width: 27, height: 27 }} />, link: "/chatbots" },
     { text: "Team", icon: <img src={require("./assets/menu-logo/team-logo.svg")} svgStyle={{ width: 27, height: 27 }} />, link: "/users" },
     { text: "History", icon: <img src={require("./assets/menu-logo/history-logo.svg")} svgStyle={{ width: 25, height: 25 }} />, link: "/history" },
@@ -16,7 +16,7 @@ const data = {
   ],
   signOutMenus: [
     { text: "Sign out", icon: <SettingsPower />, link: "/login" },
-    { text: "Change password", icon: <VpnKey />, link: "" }
+    { text: "Change password", icon: <VpnKey />, link: "/password" }
   ],
   tablePage: {
     items: [

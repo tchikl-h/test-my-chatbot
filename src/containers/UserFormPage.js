@@ -81,12 +81,14 @@ class UserFormPage extends React.Component {
       .then(() => {
         this.props.router.push("/users");
       })
+      .catch(err => console.log(err));
     }
     else {
       this.props.postUsers(this.state.user)
       .then(() => {
         this.props.router.push("/users");
       })
+      .catch(err => console.log(err));
     }
   }
 
@@ -148,7 +150,7 @@ class UserFormPage extends React.Component {
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cellHeight={!this.props.user.id ? 430 : 230}>
+            <GridList cellHeight={!this.props.user.id ? 430 : 330}>
               <GridTile style={{width: "1000px"}}>
                 <div style={styles.container}>
                   <div style={styles.leftBlock}>
