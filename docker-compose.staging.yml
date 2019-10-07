@@ -4,7 +4,7 @@ services:
   test_my_chatbot_dashboard_staging:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.staging
     container_name: staging.dashboard.test-my-chatbot.com
     restart: on-failure
     environment:
