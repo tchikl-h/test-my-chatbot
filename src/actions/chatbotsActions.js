@@ -185,7 +185,7 @@ export function invalidateLaunchChatbots() {
 export function startChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStartChatbots());
-    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/start`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
     .then(response => response.json())
     .then((res) => {
       if (res) {
