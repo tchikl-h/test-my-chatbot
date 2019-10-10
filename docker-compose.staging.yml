@@ -16,8 +16,8 @@ services:
        - ${REPO_PATH}/test-my-chatbot:/src
     # port make it available outside the container AND server
     ports:
-      - "3006:8080"
-    command: bash -c "npm install && npm run build && npm run prod"
+      - "3006:3000"
+    command: bash -c "npm run prod"
     networks:
       - default
 
