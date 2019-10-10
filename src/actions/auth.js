@@ -53,11 +53,12 @@ function invalidateToken() {
 export function loginUser(user) {
   return dispatch => {
     dispatch(requestLogin());
-    return axios.get(`${process.env.API_HOST}/v1/encrypt/${encodeURIComponent(JSON.stringify(user))}`)
+    return fetch(`${process.env.API_HOST}/v1/encrypt/${encodeURIComponent(JSON.stringify(user))}`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
-        localStorage.setItem("token", res.data);
-        dispatch(loginUserWithToken(res.data));
+      if (res) {
+        localStorage.setItem("token", res);
+        dispatch(loginUserWithToken(res));
         // dispatch(receiveLogin(res.data));
       }
       else
@@ -70,10 +71,11 @@ export function loginUser(user) {
 export function loginUserWithToken(token) {
   return dispatch => {
     dispatch(requestToken());
-    return axios.get(`${process.env.API_HOST}/v1/decrypt/${encodeURIComponent(token)}`)
+    return fetch(`${process.env.API_HOST}/v1/decrypt/${encodeURIComponent(token)}`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
-        dispatch(receiveToken(res.data));
+      if (res) {
+        dispatch(receiveToken(res));
       }
       else
         dispatch(invalidateToken());

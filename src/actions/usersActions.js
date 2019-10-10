@@ -106,10 +106,12 @@ export function invalidateDeleteUsers() {
 export function getUsers() {
   return function(dispatch) {
     dispatch(requestGetUsers());
-    return axios.get(`${process.env.API_HOST}/v1/users`)
+    return fetch(`${process.env.API_HOST}/v1/users`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200)
-        dispatch(receiveGetUsers(res.data));
+      if (res) {
+        dispatch(receiveGetUsers(res));
+      }
       else
         dispatch(invalidateGetUsers());
     })
@@ -120,10 +122,12 @@ export function getUsers() {
 export function getUsersByCompany(id) {
   return function(dispatch) {
     dispatch(requestGetUsersByCompany());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${id}/users`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${id}/users`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200)
-        dispatch(receiveGetUsersByCompany(res.data));
+      if (res) {
+        dispatch(receiveGetUsersByCompany(res));
+      }
       else
         dispatch(invalidateGetUsersByCompany());
     })

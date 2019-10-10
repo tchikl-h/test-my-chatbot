@@ -85,10 +85,12 @@ export function invalidateDeleteCompanies() {
 export function getCompanies() {
   return function(dispatch) {
     dispatch(requestGetCompanies());
-    return axios.get(`${process.env.API_HOST}/v1/companies`)
+    return fetch(`${process.env.API_HOST}/v1/companies`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200)
-        dispatch(receiveGetCompanies(res.data));
+      if (res) {
+        dispatch(receiveGetCompanies(res));
+      }
       else
         dispatch(invalidateGetCompanies());
     })
