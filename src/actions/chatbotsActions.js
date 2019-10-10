@@ -60,6 +60,7 @@ export function requestGetChatbotsByUser() {
 }
 
 export function receiveGetChatbotsByUser(chatbots) {
+  console.log(chatbots)
   return {
     type: RECEIVE_GET_CHATBOTS_BY_USER,
     chatbotsFiltered: chatbots,
@@ -184,9 +185,10 @@ export function invalidateLaunchChatbots() {
 export function startChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStartChatbots());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/start`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
+      if (res) {
         dispatch(receiveStartChatbots());
       }
       else
@@ -199,9 +201,10 @@ export function startChatbot(companyId, userId, chatbotId) {
 export function stopChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStopChatbots());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/stop`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/stop`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
+      if (res) {
         dispatch(receiveStopChatbots());
       }
       else
@@ -214,9 +217,10 @@ export function stopChatbot(companyId, userId, chatbotId) {
 export function launchChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestLaunchChatbots());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
+      if (res) {
         dispatch(receiveLaunchChatbots());
       }
       else
@@ -229,10 +233,11 @@ export function launchChatbot(companyId, userId, chatbotId) {
 export function getChatbots() {
   return function(dispatch) {
     dispatch(requestGetChatbots());
-    return axios.get(`${process.env.API_HOST}/v1/chatbots`)
+    return fetch(`${process.env.API_HOST}/v1/chatbots`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200) {
-        dispatch(receiveGetChatbots(res.data));
+      if (res) {
+        dispatch(receiveGetChatbots(res));
       }
       else
         dispatch(invalidateGetChatbots());
@@ -244,10 +249,12 @@ export function getChatbots() {
 export function getChatbotsByCompany(id) {
   return function(dispatch) {
     dispatch(requestGetChatbotsByCompany());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${id}/chatbots`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${id}/chatbots`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200)
-        dispatch(receiveGetChatbotsByCompany(res.data));
+      if (res) {
+        dispatch(receiveGetChatbotsByCompany(res));
+      }
       else
         dispatch(invalidateGetChatbotsByCompany());
     })
@@ -258,10 +265,11 @@ export function getChatbotsByCompany(id) {
 export function getChatbotsByUser(companyId, userId) {
   return function(dispatch) {
     dispatch(requestGetChatbotsByUser());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots`)
+    return fetch(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
+    .then(response => response.json())
     .then((res) => {
-      if (res.status === 200)
-        dispatch(receiveGetChatbotsByUser(res.data));
+      if (res)
+        dispatch(receiveGetChatbotsByUser(res));
       else
         dispatch(invalidateGetChatbotsByUser());
     })
