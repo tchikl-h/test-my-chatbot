@@ -106,12 +106,10 @@ export function invalidateDeleteTests() {
 export function getTests() {
   return function(dispatch) {
     dispatch(requestGetTests());
-    return fetch(`${process.env.API_HOST}/v1/tests`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
-    .then(response => response.json())
+    return axios.get(`${process.env.API_HOST}/v1/tests`)
     .then((res) => {
-      if (res) {
-        dispatch(receiveGetTests(res));
-      }
+      if (res.status === 200)
+        dispatch(receiveGetTests(res.data));
       else
         dispatch(invalidateGetTests());
     })
@@ -122,12 +120,10 @@ export function getTests() {
 export function getTestsByChatbot(id) {
   return function(dispatch) {
     dispatch(requestGetTestsByChatbot());
-    return fetch(`${process.env.API_HOST}/v1/chatbots/${id}/tests`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
-    .then(response => response.json())
+    return axios.get(`${process.env.API_HOST}/v1/chatbots/${id}/tests`)
     .then((res) => {
-      if (res) {
-        dispatch(receiveGetTestsByChatbot(res));
-      }
+      if (res.status === 200)
+        dispatch(receiveGetTestsByChatbot(res.data));
       else
         dispatch(invalidateGetTestsByChatbot());
     })

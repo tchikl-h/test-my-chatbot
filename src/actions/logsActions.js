@@ -106,12 +106,10 @@ export function invalidateDeleteLogs() {
 export function getLogs() {
   return function(dispatch) {
     dispatch(requestGetLogs());
-    return fetch(`${process.env.API_HOST}/v1/logs`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
-    .then(response => response.json())
+    return axios.get(`${process.env.API_HOST}/v1/logs`)
     .then((res) => {
-      if (res) {
-        dispatch(receiveGetLogs(res));
-      }
+      if (res.status === 200)
+        dispatch(receiveGetLogs(res.data));
       else
         dispatch(invalidateGetLogs());
     })
@@ -122,12 +120,10 @@ export function getLogs() {
 export function getLogsByChatbot(id) {
   return function(dispatch) {
     dispatch(requestGetLogsByChatbot());
-    return fetch(`${process.env.API_HOST}/v1/chatbots/${id}/logs`, {headers: {Authorization: process.env.ADMIN_TOKEN}})
-    .then(response => response.json())
+    return axios.get(`${process.env.API_HOST}/v1/chatbots/${id}/logs`)
     .then((res) => {
-      if (res) {
-        dispatch(receiveGetLogsByChatbot(res));
-      }
+      if (res.status === 200)
+        dispatch(receiveGetLogsByChatbot(res.data));
       else
         dispatch(invalidateGetLogsByChatbot());
     })
