@@ -6,5 +6,4 @@ COPY . /src
 RUN rm -rf .env && cp .env.docker.staging .env
 RUN apt-get update && apt-get install python build-essential -y
 RUN npm install
-
-ENV HOST 0.0.0.0
+RUN npm uninstall node-sass && npm install node-sass

@@ -12,6 +12,7 @@ services:
       - LETSENCRYPT_HOST=dashboard.test-my-chatbot.com
       - LETSENCRYPT_EMAIL=herve.tchikladze@epitech.eu
       - NODE_ENV=production
+      - HOST=https://dashboard.test-my-chatbot.com
     volumes:
        - ${REPO_PATH}/test-my-chatbot:/src
     # port make it available outside the container AND server

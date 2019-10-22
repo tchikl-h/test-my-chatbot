@@ -12,11 +12,12 @@ services:
       - LETSENCRYPT_HOST=staging.dashboard.test-my-chatbot.com
       - LETSENCRYPT_EMAIL=herve.tchikladze@epitech.eu
       - NODE_ENV=staging
+      - HOST=https://staging.dashboard.test-my-chatbot.com
     volumes:
        - ${REPO_PATH}/test-my-chatbot:/src
     # port make it available outside the container AND server
     ports:
-      - "3006:8080"
+      - "3006:3000"
     command: bash -c "npm run start"
     networks:
       - default
