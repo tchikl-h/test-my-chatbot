@@ -14,10 +14,10 @@ services:
       - NODE_ENV=production
       - HOST=https://dashboard.test-my-chatbot.com
     volumes:
-       - ${REPO_PATH}/test-my-chatbot:/src
+       - ${REPO_PATH}:/src
     # port make it available outside the container AND server
     ports:
-      - "3007:8080"
+      - "3007:3000"
     command: bash -c "npm install && npm run build && npm run prod"
     networks:
       - default
