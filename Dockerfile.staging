@@ -1,9 +1,7 @@
-FROM node:12-slim
+FROM node:10-slim
 
 WORKDIR /src
 COPY . /src
 
 RUN rm -rf .env && cp .env.docker.staging .env
-RUN apt-get update && apt-get install python build-essential -y
 RUN npm install
-RUN npm uninstall node-sass && npm install node-sass

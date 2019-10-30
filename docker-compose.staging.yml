@@ -14,7 +14,7 @@ services:
       - NODE_ENV=staging
       - HOST=https://staging.dashboard.test-my-chatbot.com
     volumes:
-       - ${REPO_PATH}/test-my-chatbot:/src
+       - ${REPO_PATH}:/src
     # port make it available outside the container AND server
     ports:
       - "3006:3000"
