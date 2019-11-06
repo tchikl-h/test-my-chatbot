@@ -73,7 +73,14 @@ export function loginUserWithToken(token) {
     return axios.get(`${process.env.API_HOST}/v1/decrypt/${encodeURIComponent(token)}`)
     .then((res) => {
       if (res.status === 200) {
-        dispatch(receiveToken(res.data));
+        let userToken = res.data
+        axios.get(`${process.env.API_HOST}/v1/companies/${userToken.companyId}/users/${userToken.id}`)
+        .then((res) => {
+          if (res.status === 200 && JSON.stringify(userToken) === JSON.stringify(res.data)) {
+            dispatch(receiveToken(userToken));
+          }
+        })
+        .catch(err => console.log(err));
       }
       else
         dispatch(invalidateToken());
