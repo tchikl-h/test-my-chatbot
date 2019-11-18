@@ -8,12 +8,14 @@ import {
   REQUEST_START_CHATBOTS, RECEIVE_START_CHATBOTS, INVALIDATE_START_CHATBOTS,
   REQUEST_STOP_CHATBOTS, RECEIVE_STOP_CHATBOTS, INVALIDATE_STOP_CHATBOTS,
   REQUEST_LAUNCH_CHATBOTS, RECEIVE_LAUNCH_CHATBOTS, INVALIDATE_LAUNCH_CHATBOTS,
+  REQUEST_TALK_CHATBOTS, RECEIVE_TALK_CHATBOTS, INVALIDATE_TALK_CHATBOTS,
 } from "../actions/actionTypes";
 
 const initialState = {
   isFetching: false,
   didInvalidate: false,
-  lastUpdated: "",
+  lastUpdated: new Date,
+  chatbotResponse: "",
   chatbots: [],
   chatbotsFilteredByCompany: [],
   chatbotsFilteredByUser: [],
@@ -179,6 +181,25 @@ export default function(state = initialState, action) {
         ...state,
         isFetching: false,
         didInvalidate: false,
+      }
+    case INVALIDATE_TALK_CHATBOTS:
+      return {
+        ...state,
+        didInvalidate: true
+      }
+    case REQUEST_TALK_CHATBOTS:
+      return {
+        ...state,
+        isFetching: true,
+        didInvalidate: false
+      }
+    case RECEIVE_TALK_CHATBOTS:
+      return {
+        ...state,
+        isFetching: false,
+        didInvalidate: false,
+        chatbotResponse: action.chatbotResponse,
+        lastUpdated: action.receivedAt
       }
     default:
       return state

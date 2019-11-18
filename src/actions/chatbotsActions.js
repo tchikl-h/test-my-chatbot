@@ -8,6 +8,7 @@ import {
   REQUEST_START_CHATBOTS, RECEIVE_START_CHATBOTS, INVALIDATE_START_CHATBOTS,
   REQUEST_STOP_CHATBOTS, RECEIVE_STOP_CHATBOTS, INVALIDATE_STOP_CHATBOTS,
   REQUEST_LAUNCH_CHATBOTS, RECEIVE_LAUNCH_CHATBOTS, INVALIDATE_LAUNCH_CHATBOTS,
+  REQUEST_TALK_CHATBOTS, RECEIVE_TALK_CHATBOTS, INVALIDATE_TALK_CHATBOTS,
 } from "./actionTypes";
 import axios from "axios";
 
@@ -181,6 +182,26 @@ export function invalidateLaunchChatbots() {
   }
 }
 
+export function requestTalkChatbots() {
+  return {
+    type: REQUEST_TALK_CHATBOTS,
+  }
+}
+
+export function receiveTalkChatbots(chatbotResponse) {
+  return {
+    type: RECEIVE_TALK_CHATBOTS,
+    chatbotResponse: chatbotResponse,
+    receivedAt: Date.now()
+  }
+}
+
+export function invalidateTalkChatbots() {
+  return {
+    type: INVALIDATE_TALK_CHATBOTS,
+  }
+}
+
 export function startChatbot(companyId, userId, chatbotId) {
   return function(dispatch) {
     dispatch(requestStartChatbots());
@@ -221,6 +242,24 @@ export function launchChatbot(companyId, userId, chatbotId) {
       }
       else
         dispatch(invalidateLaunchChatbots());
+    })
+    .catch(err => console.log(err));
+  }
+}
+
+export function talkChatbot(companyId, userId, chatbotId, msg) {
+  return function(dispatch) {
+    dispatch(requestTalkChatbots());
+    console.log(msg);
+    return axios.post(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/talk`, {
+      msg: msg
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        dispatch(receiveTalkChatbots(res.data));
+      }
+      else
+        dispatch(invalidateTalkChatbots());
     })
     .catch(err => console.log(err));
   }

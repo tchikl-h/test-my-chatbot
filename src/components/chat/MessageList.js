@@ -13,7 +13,7 @@ export default class MessageList extends React.Component {
             if(message.type == 'message' && message.user == 0) return (
               <MessageBoxUser key={i} text={message.text} time={message.time} currentuser={message.currentuser} user={message.user} />
             );
-            else if (message.type == 'message' && message.user == 5) return (
+            else if (message.type == 'message' && message.user == 1) return (
               <MessageBoxBot key={i} text={message.text} time={message.time} currentuser={message.currentuser} user={message.user} />
             );
             else if (!message.type) return (
