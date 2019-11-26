@@ -23,6 +23,7 @@ import { getUserFilteredById } from "../selectors/usersSelectors";
 import RaisedButton from "material-ui/RaisedButton";
 import { getCompanies } from "../actions/companiesActions";
 import { getCompanyById } from "../selectors/companiesSelectors";
+import { getAssertionsByTest } from "../actions/assertionsActions";
 const io = require("socket.io-client");
 let socket;
 
@@ -42,15 +43,7 @@ class TestListPage extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({testLaunchedAtLeastOnce: false});
-    let testList = nextProps.testList;
-    for(let i = 0; i < testList.length; i++) {
-      const newTest = Object.assign({}, testList[i]);
-      newTest['completed'] = false;
-      newTest['result'] = -1; // {-1: init, 0: success, 1: error}
-      newTest['logs'] = "";
-      testList[i] = newTest;
-    }
-    this.setState({ testList: testList });
+    this.setState({ testList: nextProps.testList });
   }
   
   componentWillMount() {
@@ -124,16 +117,40 @@ class TestListPage extends React.Component {
     this.setState({ id: id });
   }
 
+  findErrorThroughAssertions(test, chatbotId) {
+    this.props.getAssertionsByTest(test.id)
+    .then((assertions) => {
+        console.log(assertions);
+        for (let i = 0; i < assertions.length; i++) {
+          if (assertions[i].error !== null) {
+            test.error = assertions[i].error;
+            this.setState({testError: test});
+            this.props.postLogs(test.error, "0/0", chatbotId);
+          }
+        }
+    })
+    .catch(err => console.log(err));
+  }
+
   handleClick(event) {
     event.preventDefault();
     if (this.props.user && this.props.chatbot) {
-      this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id)
-      .then(() => {
-        this.resetTestList();
-        this.setState({launchTestsButtonDisabled: true});
-        this.setState({testLaunchedAtLeastOnce: true});
+      let tests = [];
+      this.setState({launchTestsButtonDisabled: true});
+      this.setState({testLaunchedAtLeastOnce: true});
+      this.state.testList.forEach((test) => {
+        this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, test.id)
+        .then((res) => {
+          if (res.error === true) {
+            this.findErrorThroughAssertions(res, this.props.chatbot.id);
+          }
+          tests.push(res)
+          this.setState({testList: this.state.testList});
+          // this.resetTestList();
+          this.setState({launchTestsButtonDisabled: false});
+        })
+        .catch(err => console.log(err));
       })
-      .catch(err => console.log(err));
     }
   }
 
@@ -219,7 +236,8 @@ class TestListPage extends React.Component {
                             test={test}
                             chatbotId={this.props.routeParams.id}
                             onDelete={(id) => this.onDelete(id)}
-                            testLaunched={this.state.testLaunchedAtLeastOnce}
+                            testLaunchedOnce={this.state.testLaunchedAtLeastOnce}
+                            testLaunched={this.state.launchTestsButtonDisabled}
                           />
                       </div>
                 ))}
@@ -240,7 +258,7 @@ class TestListPage extends React.Component {
                     color={grey200}
                     chatbotId={this.props.routeParams.id}
                     testName={this.state.testError.name}
-                    errorMessage={this.state.testError.logs}
+                    errorMessage={this.state.testError.error}
                   />
                 }
               </div>
@@ -275,4 +293,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies, postLogs })(TestListPage);
+export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies, postLogs, getAssertionsByTest })(TestListPage);

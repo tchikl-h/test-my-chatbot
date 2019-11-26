@@ -188,58 +188,14 @@ class ChatbotFormPage extends React.Component {
 
               <GridTile>
                 <FormsyText
-                  hintText="jojo-owvrog"
-                  floatingLabelText="Dialogflow project ID"
-                  name="dialogflow_project_id"
+                  hintText="https://mycompany.com/chatbot/loulou/talk"
+                  floatingLabelText="Chatbot webhook url"
+                  name="webhook_url"
                   onChange={this.handleChange}
                   fullWidth={true}
                   value={
-                    chatbot.dialogflow_project_id
-                      ? chatbot.dialogflow_project_id
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="test-my-chatbot-322@jojo-owvrog.iam.gserviceaccount.com"
-                  floatingLabelText="Dialogflow client email"
-                  name="dialogflow_client_email"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.dialogflow_client_email
-                      ? chatbot.dialogflow_client_email
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCYI..."
-                  floatingLabelText="Dialogflow private key"
-                  name="dialogflow_private_key"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.dialogflow_private_key
-                      ? chatbot.dialogflow_private_key
+                    chatbot.webhook_url
+                      ? chatbot.webhook_url
                       : ""
                   }
                   validations={{

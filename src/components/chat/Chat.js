@@ -66,8 +66,8 @@ class Chat extends React.Component {
       .then((test) => {
         console.log(test);
         // TODO: add return value to postTests so we get the id of the test
-        this.state.assertions.forEach((assertion) => {
-          this.props.postAssertions(assertion.userInput, assertion.chatbotResponse, assertion.intent, test.id)
+        this.state.assertions.forEach((assertion, index) => {
+          this.props.postAssertions(index, assertion.userInput, assertion.chatbotResponse, assertion.intent, test.id)
         })
         this.setState({ open: false });
         // TODO: check the catch

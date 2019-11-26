@@ -117,27 +117,30 @@ export function getAssertions() {
   }
 }
 
-export function getAssertionsByTest(id) {
-  return function(dispatch) {
+export const getAssertionsByTest = (id) => (dispatch) =>
+  new Promise(function(resolve, reject) {
     dispatch(requestGetAssertionsByTest());
     return axios.get(`${process.env.API_HOST}/v1/tests/${id}/assertions`)
     .then((res) => {
-      if (res.status === 200)
+      if (res.status === 200) {
         dispatch(receiveGetAssertionsByTest(res.data));
+        resolve(res.data);
+      }
       else
-        dispatch(invalidateGetAssertionsByTest());
+      dispatch(invalidateGetAssertionsByTest());
+        reject();
     })
     .catch(err => console.log(err));
-  }
-}
+  });
 
-export const postAssertions = (userInput, chatbotResponse, intent, testId) => (dispatch) =>
+export const postAssertions = (orderId, userInput, chatbotResponse, intent, testId) => (dispatch) =>
   new Promise(function(resolve, reject) {
     dispatch(requestPostAssertions());
     return axios({
       method: 'post',
       url: `${process.env.API_HOST}/v1/assertions`,
       data: {
+        orderId: orderId,
         userInput: userInput,
         chatbotResponse: chatbotResponse,
         intent: intent,

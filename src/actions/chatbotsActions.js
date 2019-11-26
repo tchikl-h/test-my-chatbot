@@ -232,20 +232,22 @@ export function stopChatbot(companyId, userId, chatbotId) {
   }
 }
 
-export function launchChatbot(companyId, userId, chatbotId) {
-  return function(dispatch) {
+export const launchChatbot = (companyId, userId, chatbotId, testId) => (dispatch) =>
+  new Promise(function(resolve, reject) {
     dispatch(requestLaunchChatbots());
-    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/launch`)
+    return axios.get(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/tests/${testId}/launch`)
     .then((res) => {
+      console.log(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/tests/${testId}/launch`);
       if (res.status === 200) {
         dispatch(receiveLaunchChatbots());
+        resolve(res.data);
       }
       else
         dispatch(invalidateLaunchChatbots());
+        reject();
     })
     .catch(err => console.log(err));
-  }
-}
+  });
 
 export function talkChatbot(companyId, userId, chatbotId, msg) {
   return function(dispatch) {
@@ -318,9 +320,7 @@ export const postChatbots = chatbot => (dispatch) =>
         projectName: chatbot.project_name,
         description: chatbot.description,
         //containerMode: chatbot.container_mode,
-        dialogflowProjectId: chatbot.dialogflow_project_id,
-        dialogflowClientEmail: chatbot.dialogflow_client_email,
-        dialogflowPrivateKey: chatbot.dialogflow_private_key,
+        webhook_url: chatbot.webhook_url,
         companyId: chatbot.companyId,
         periodicBuild: chatbot.periodic_build
       }
@@ -348,9 +348,7 @@ export const patchChatbots = chatbot => (dispatch) =>
         projectName: chatbot.project_name,
         description: chatbot.description,
         //containerMode: chatbot.container_mode,
-        dialogflowProjectId: chatbot.dialogflow_project_id,
-        dialogflowClientEmail: chatbot.dialogflow_client_email,
-        dialogflowPrivateKey: chatbot.dialogflow_private_key,
+        webhook_url: chatbot.webhook_url,
         companyId: chatbot.companyId,
         periodicBuild: chatbot.periodic_build
       }
