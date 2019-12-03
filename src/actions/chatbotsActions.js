@@ -253,7 +253,7 @@ export function talkChatbot(companyId, userId, chatbotId, msg) {
   return function(dispatch) {
     dispatch(requestTalkChatbots());
     console.log(msg);
-    return axios.post(`https://chatbot.test-my-chatbot.com/talk?azd`)
+    return axios.post(`https://chatbot.test-my-chatbot.com/talk?msg='azd'`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveTalkChatbots(res.data));
