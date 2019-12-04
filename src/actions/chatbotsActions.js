@@ -253,9 +253,7 @@ export function talkChatbot(companyId, userId, chatbotId, msg) {
   return function(dispatch) {
     dispatch(requestTalkChatbots());
     console.log(msg);
-    return axios.get(`https://chatbot.herve-tchikladze.com/talk`, {
-      msg: msg
-    })
+    return axios.get(`https://chatbot.herve-tchikladze.com/talk?msg=${msg}`)
     .then((res) => {
       if (res.status === 200) {
         dispatch(receiveTalkChatbots(res.data));
