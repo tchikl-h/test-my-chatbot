@@ -102,7 +102,7 @@ class Chat extends React.Component {
           userInput: data.msg.text
       }
     }));
-    this.props.talkChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, data.msg.text)
+    this.props.talkChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, this.props.chatbot.webhook_url, data.msg.text)
     .then(() => {
       this.messageReceivedByBot();
     })

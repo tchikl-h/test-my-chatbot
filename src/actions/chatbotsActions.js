@@ -249,13 +249,19 @@ export const launchChatbot = (companyId, userId, chatbotId, testId) => (dispatch
     .catch(err => console.log(err));
   });
 
-export function talkChatbot(companyId, userId, chatbotId, msg) {
+export function talkChatbot(companyId, userId, chatbotId, webhook_url, msg) {
   return function(dispatch) {
     dispatch(requestTalkChatbots());
     console.log(msg);
-    return axios.get(`https://chatbot.herve-tchikladze.com/talk?msg=${msg}`)
+    return axios({
+      method: 'post',
+      url: `${webhook_url}`,
+      data: {
+        message: msg
+      }
+    })
     .then((res) => {
-      if (res.status === 200) {
+      if (res.status === 201) {
         dispatch(receiveTalkChatbots(res.data));
       }
       else
