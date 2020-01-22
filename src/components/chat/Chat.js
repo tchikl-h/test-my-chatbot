@@ -9,8 +9,8 @@ import { startChatbot, talkChatbot } from "../../actions/chatbotsActions";
 import { postTests } from "../../actions/testsActions";
 import { postAssertions } from "../../actions/assertionsActions";
 import Popup from "../../components/dashboard/Popup";
-
 const io = require("socket.io-client");
+let socketio = io.connect(process.env.API_HOST);
 let socket;
 
 class Chat extends React.Component {
@@ -45,8 +45,7 @@ class Chat extends React.Component {
     socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${chatbot.id}-${this.props.user.id}`);
     // 3) receive user
     socket.on('send:message:user', this.messageReceive);
-    // 3) receive bot
-    socket.on('send:message:bot', this.messageReceivedByBot);
+    socketio.on('message:talk', this.messageReceivedByBot);
   }
 
   componentWillUnmount() {
@@ -64,7 +63,6 @@ class Chat extends React.Component {
     else if (data.isConfirmed && chatbot.id && data.name && data.name != "" && data.description && data.description != "") {
       this.props.postTests(data.name, data.description, chatbot.id)
       .then((test) => {
-        console.log(test);
         // TODO: add return value to postTests so we get the id of the test
         this.state.assertions.forEach((assertion, index) => {
           this.props.postAssertions(index, assertion.userInput, assertion.chatbotResponse, assertion.intent, test.id)
@@ -102,22 +100,19 @@ class Chat extends React.Component {
           userInput: data.msg.text
       }
     }));
-    this.props.talkChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, this.props.chatbot.webhook_url, data.msg.text)
-    .then(() => {
-      this.messageReceivedByBot();
-    })
+    this.props.talkChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, data.msg.text)
     newMessages.push(data.msg);
     this.setState( {messages : newMessages} );
     window.scrollTo(0, document.body.scrollHeight);
   }
 
-  messageReceivedByBot() {
+  messageReceivedByBot(data) {
     let newMessages = this.state.messages;
     this.setState(prevState => ({
       assertion: {
           ...prevState.assertion,
-          chatbotResponse: this.props.chatbotResponse.msg,
-          intent: this.props.chatbotResponse.intent
+          chatbotResponse: data.msg, // socket this.props.chatbotResponse.msg partie receveuse
+          intent: data.intent
       }
     }));
     this.setState(prevState => {
@@ -125,7 +120,7 @@ class Chat extends React.Component {
     });
     newMessages.push({
       type : 'message',
-      text : this.props.chatbotResponse.msg,
+      text : data.msg,
       time : 0, // Set by the server
       user : 1, // Set before sending
       currentuser: true
@@ -139,15 +134,6 @@ class Chat extends React.Component {
     socket.emit('send:message:user', {
       msg: message
     });
-  }
-
-  changeRecordStateWithSocket(isRecording) {
-    if (isRecording === true) {
-      socket.emit('stop:recording');
-    }
-    else {
-      socket.emit('start:recording');
-    }
   }
 
   render() {
@@ -165,7 +151,6 @@ class Chat extends React.Component {
           onMessageSubmit={this.messageSend} 
           statusRecord={(isRecording) => this.statusRecord(isRecording)}
           openSaveTestDialog={() => this.handleOpen()}
-          changeRecordStateWithSocket={(isRecording) => this.changeRecordStateWithSocket(isRecording)}
         />
         <Popup
           dialogText={`What is the name of your test ?`}

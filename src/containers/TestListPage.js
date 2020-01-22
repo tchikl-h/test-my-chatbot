@@ -51,7 +51,7 @@ class TestListPage extends React.Component {
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id);
     socket = io.connect(process.env.HOST);
     socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
-    socket.on('logs', (test) => this.updateTestList(test));
+    // socket.on('logs', (test) => this.updateTestList(test));
   }
 
   componentDidMount() {
@@ -86,7 +86,7 @@ class TestListPage extends React.Component {
         }
         if (testList[i].completed === true && testList[i].result === 1) {
           this.setState({testError: testList[i]});
-          this.props.postLogs(data.test.logs, "0/0", this.props.chatbot.id);
+          // this.props.postLogs(data.test.logs, "0/0", this.props.chatbot.id);
         }
         this.setState({ testList: testList });
         return;
@@ -120,14 +120,13 @@ class TestListPage extends React.Component {
   findErrorThroughAssertions(test, chatbotId) {
     this.props.getAssertionsByTest(test.id)
     .then((assertions) => {
-        console.log(assertions);
-        for (let i = 0; i < assertions.length; i++) {
-          if (assertions[i].error !== null) {
-            test.error = assertions[i].error;
-            this.setState({testError: test});
-            this.props.postLogs(test.error, "0/0", chatbotId);
-          }
+      for (const assertion of assertions) {
+        if (assertion.error !== null) {
+          test.error = assertion.error;
+          this.setState({testError: test});
+          // this.props.postLogs(test.error, "0/0", chatbotId);
         }
+      }
     })
     .catch(err => console.log(err));
   }
@@ -135,22 +134,22 @@ class TestListPage extends React.Component {
   handleClick(event) {
     event.preventDefault();
     if (this.props.user && this.props.chatbot) {
-      let tests = [];
       this.setState({launchTestsButtonDisabled: true});
       this.setState({testLaunchedAtLeastOnce: true});
-      this.state.testList.forEach((test) => {
-        this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, test.id)
-        .then((res) => {
-          if (res.error === true) {
-            this.findErrorThroughAssertions(res, this.props.chatbot.id);
-          }
-          tests.push(res)
-          this.setState({testList: this.state.testList});
-          // this.resetTestList();
+        this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, 1)
+        .then((tests) => {
+          tests.forEach((test) => {
+            if (test.error !== false) {
+              this.findErrorThroughAssertions(test, this.props.chatbot.id);
+            }
+            else if (this.state.testError) {
+              this.state.testError = null;
+            }
+          })
+          this.setState({testList: tests});
           this.setState({launchTestsButtonDisabled: false});
         })
         .catch(err => console.log(err));
-      })
     }
   }
 
@@ -282,11 +281,7 @@ function mapStateToProps(state, ownProps) {
     user: getUserFilteredById(state, user.id) || {},
     currentUser: user,
     company: getCompanyById(state, user.companyId),
-    testList: getTestFilteredList(state).sort(function(a, b){
-      if(a.name < b.name) { return -1; }
-      if(a.name > b.name) { return 1; }
-      return 0;
-    }),
+    testList: getTestFilteredList(state),
     chatbot: getChatbotFilteredById(state, ownProps.params.id),
     isAuthenticated,
     errorMessage,

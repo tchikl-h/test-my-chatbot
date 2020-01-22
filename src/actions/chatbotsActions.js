@@ -249,19 +249,14 @@ export const launchChatbot = (companyId, userId, chatbotId, testId) => (dispatch
     .catch(err => console.log(err));
   });
 
-export function talkChatbot(companyId, userId, chatbotId, webhook_url, msg) {
+export function talkChatbot(companyId, userId, chatbotId, msg) {
   return function(dispatch) {
     dispatch(requestTalkChatbots());
-    console.log(msg);
-    return axios({
-      method: 'post',
-      url: `${webhook_url}`,
-      data: {
-        message: msg
-      }
+    return axios.post(`${process.env.API_HOST}/v1/companies/${companyId}/users/${userId}/chatbots/${chatbotId}/talk`, {
+      message: msg
     })
     .then((res) => {
-      if (res.status === 201) {
+      if (res.status === 200 && res.data.status === 200) {
         dispatch(receiveTalkChatbots(res.data));
       }
       else
@@ -326,6 +321,7 @@ export const postChatbots = chatbot => (dispatch) =>
         //containerMode: chatbot.container_mode,
         webhook_url: chatbot.webhook_url,
         companyId: chatbot.companyId,
+        userId: chatbot.userId,
         periodicBuild: chatbot.periodic_build
       }
     })
