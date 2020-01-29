@@ -64,29 +64,6 @@ function shutDown() {
 io.sockets.on('connection', function(socket) {
   socket.on('room', function(room) {
       socket.join(room, () => {
-
-        socket.in(room).on('start:recording', function() {
-          io.sockets.in(room).emit('start:recording');
-        });
-
-        socket.in(room).on('stop:recording', function() {
-          io.sockets.in(room).emit('stop:recording');
-        });
-
-        // 1) receive bot
-        socket.in(room).on('send:message:bot', function(data) {
-          // 2) send bot
-          io.sockets.in(room).emit('send:message:bot', {
-            msg: data.msg
-          });
-        });
-
-        socket.in(room).on('logs', function(data) {
-          // 2) send bot
-          io.sockets.in(room).emit('logs', {
-            test: data
-          });
-        });
       
         // 1) receive user
         socket.in(room).on('send:message:user', function(data) {

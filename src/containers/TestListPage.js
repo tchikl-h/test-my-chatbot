@@ -23,6 +23,7 @@ import { getUserFilteredById } from "../selectors/usersSelectors";
 import RaisedButton from "material-ui/RaisedButton";
 import { getCompanies } from "../actions/companiesActions";
 import { getCompanyById } from "../selectors/companiesSelectors";
+import { getAssertionsByTest } from "../actions/assertionsActions";
 const io = require("socket.io-client");
 let socket;
 
@@ -42,15 +43,7 @@ class TestListPage extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({testLaunchedAtLeastOnce: false});
-    let testList = nextProps.testList;
-    for(let i = 0; i < testList.length; i++) {
-      const newTest = Object.assign({}, testList[i]);
-      newTest['completed'] = false;
-      newTest['result'] = -1; // {-1: init, 0: success, 1: error}
-      newTest['logs'] = "";
-      testList[i] = newTest;
-    }
-    this.setState({ testList: testList });
+    this.setState({ testList: nextProps.testList });
   }
   
   componentWillMount() {
@@ -58,7 +51,7 @@ class TestListPage extends React.Component {
     this.props.startChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id);
     socket = io.connect(process.env.HOST);
     socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${this.props.chatbot.id}-${this.props.user.id}`);
-    socket.on('logs', (test) => this.updateTestList(test));
+    // socket.on('logs', (test) => this.updateTestList(test));
   }
 
   componentDidMount() {
@@ -93,7 +86,7 @@ class TestListPage extends React.Component {
         }
         if (testList[i].completed === true && testList[i].result === 1) {
           this.setState({testError: testList[i]});
-          this.props.postLogs(data.test.logs, "0/0", this.props.chatbot.id);
+          // this.props.postLogs(data.test.logs, "0/0", this.props.chatbot.id);
         }
         this.setState({ testList: testList });
         return;
@@ -124,16 +117,39 @@ class TestListPage extends React.Component {
     this.setState({ id: id });
   }
 
+  findErrorThroughAssertions(test, chatbotId) {
+    this.props.getAssertionsByTest(test.id)
+    .then((assertions) => {
+      for (const assertion of assertions) {
+        if (assertion.error !== null) {
+          test.error = assertion.error;
+          this.setState({testError: test});
+          // this.props.postLogs(test.error, "0/0", chatbotId);
+        }
+      }
+    })
+    .catch(err => console.log(err));
+  }
+
   handleClick(event) {
     event.preventDefault();
     if (this.props.user && this.props.chatbot) {
-      this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id)
-      .then(() => {
-        this.resetTestList();
-        this.setState({launchTestsButtonDisabled: true});
-        this.setState({testLaunchedAtLeastOnce: true});
-      })
-      .catch(err => console.log(err));
+      this.setState({launchTestsButtonDisabled: true});
+      this.setState({testLaunchedAtLeastOnce: true});
+        this.props.launchChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, 1)
+        .then((tests) => {
+          tests.forEach((test) => {
+            if (test.error !== false) {
+              this.findErrorThroughAssertions(test, this.props.chatbot.id);
+            }
+            else if (this.state.testError) {
+              this.state.testError = null;
+            }
+          })
+          this.setState({testList: tests});
+          this.setState({launchTestsButtonDisabled: false});
+        })
+        .catch(err => console.log(err));
     }
   }
 
@@ -219,7 +235,8 @@ class TestListPage extends React.Component {
                             test={test}
                             chatbotId={this.props.routeParams.id}
                             onDelete={(id) => this.onDelete(id)}
-                            testLaunched={this.state.testLaunchedAtLeastOnce}
+                            testLaunchedOnce={this.state.testLaunchedAtLeastOnce}
+                            testLaunched={this.state.launchTestsButtonDisabled}
                           />
                       </div>
                 ))}
@@ -240,7 +257,7 @@ class TestListPage extends React.Component {
                     color={grey200}
                     chatbotId={this.props.routeParams.id}
                     testName={this.state.testError.name}
-                    errorMessage={this.state.testError.logs}
+                    errorMessage={this.state.testError.error}
                   />
                 }
               </div>
@@ -264,15 +281,11 @@ function mapStateToProps(state, ownProps) {
     user: getUserFilteredById(state, user.id) || {},
     currentUser: user,
     company: getCompanyById(state, user.companyId),
-    testList: getTestFilteredList(state).sort(function(a, b){
-      if(a.name < b.name) { return -1; }
-      if(a.name > b.name) { return 1; }
-      return 0;
-    }),
+    testList: getTestFilteredList(state),
     chatbot: getChatbotFilteredById(state, ownProps.params.id),
     isAuthenticated,
     errorMessage,
   };
 }
 
-export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies, postLogs })(TestListPage);
+export default connect(mapStateToProps, { startChatbot, getTestsByChatbot, deleteTests, getChatbotsByUser, launchChatbot, getUsersByCompany, getCompanies, postLogs, getAssertionsByTest })(TestListPage);

@@ -108,9 +108,9 @@ class TestBox extends React.Component {
             <ActionDelete />
           </FloatingActionButton>
           {
-            this.props.testLaunched ?
-              test.completed ?
-                test.result === 0 ?
+            this.props.testLaunchedOnce ?
+            !this.props.testLaunched ?
+                test.error === false ?
                   <img style={styles.resultIcon} src={require(`../../assets/img/success.png`)} />
                   : <img style={styles.resultIcon} src={require(`../../assets/img/fail.png`)} />
               : <CircularProgress style={styles.resultIcon} />
@@ -127,7 +127,8 @@ TestBox.propTypes = {
   test: PropTypes.object,
   chatbotId: PropTypes.integer,
   onDelete: PropTypes.func,
-  testLaunched: PropTypes.boolean
+  testLaunchedOnce: PropTypes.boolean,
+  testLaunched: PropTypes.boolean,
 };
 
 export default TestBox;

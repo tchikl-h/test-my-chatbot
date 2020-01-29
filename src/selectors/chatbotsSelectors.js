@@ -29,5 +29,11 @@ export const getChatbotFilteredById = (store, id) => {
     }
 }
 
+export const getChatbotResponseById = store =>
+getChatbotState(store) ? getChatbotState(store).chatbotResponse : [];
+
+export const getChatbotLastUpdatedById = store =>
+getChatbotState(store) ? getChatbotState(store).lastUpdated : [];
+
 export const getChatbotIsFetching = store =>
 getChatbotState(store).isFetching;

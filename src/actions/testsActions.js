@@ -146,7 +146,7 @@ export const postTests = (name, description, chatbotId) => (dispatch) =>
     .then((res) => {
       if (res.status === 200) {
         dispatch(receivePostTests());
-        resolve();
+        resolve(res.data);
       }
       else
         dispatch(invalidatePostTests());

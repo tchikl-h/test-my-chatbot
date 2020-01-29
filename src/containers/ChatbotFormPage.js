@@ -2,13 +2,13 @@ import React, { PropTypes } from "react";
 import { Link } from "react-router";
 import RaisedButton from "material-ui/RaisedButton";
 import PageBase from "../components/PageBase";
-// import { FormControl, InputLabel,Select, MenuItem } from '@material-ui/core';
 import { connect } from "react-redux";
 import { GridList, GridTile } from "material-ui/GridList";
 import { FormsyText } from "formsy-material-ui/lib";
 import Formsy from "formsy-react";
 import CircularProgress from "material-ui/CircularProgress";
 import autoBind from "react-autobind";
+import { getUserFilteredById } from "../selectors/usersSelectors";
 import { getChatbotsByUser, postChatbots, patchChatbots } from "../actions/chatbotsActions";
 import { getChatbotFilteredById, getChatbotIsFetching } from "../selectors/chatbotsSelectors";
 import { getCompanies } from "../actions/companiesActions";
@@ -21,9 +21,11 @@ class ChatbotFormPage extends React.Component {
     super(props);
     autoBind(this);
     this.state = {
+      isEdit: false,
       isFetching: this.props.routeParams.id ? true : false, // fetching :id of the chatbot if exists
       chatbot: {
-        companyId: this.props.currentUser.companyId
+        companyId: this.props.currentUser.companyId,
+        userId: this.props.currentUser.id
       }
     };
   }
@@ -36,6 +38,7 @@ class ChatbotFormPage extends React.Component {
   componentWillReceiveProps(nextProps) {
     // detect if fetching of not
     if (nextProps.chatbot && nextProps.chatbot.id) {
+      this.setState({ isEdit: true });
       this.setState({ isFetching: false });
       this.setState({ chatbot: Object.assign({}, nextProps.chatbot) });
     }
@@ -101,7 +104,13 @@ class ChatbotFormPage extends React.Component {
       },
       saveButton: {
         marginLeft: 5
-      }
+      },
+      container: {
+        margin: "auto",
+        padding: 5,
+        width: "90%",
+        float: "left"
+      },
     };
     if (isFetching || !this.props.company) {
       return <CircularProgress />;
@@ -119,169 +128,95 @@ class ChatbotFormPage extends React.Component {
             onValidSubmit={this.handleClick}
             onInvalidSubmit={this.notifyFormError}
           >
-            <GridList cols={1} cellHeight={70}>
+            <GridList cols={1} cellHeight={400}>
               <GridTile>
-                <FormsyText
-                  hintText="My awesome chatbot"
-                  floatingLabelText="Name"
-                  name="project_name"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.project_name
-                      ? chatbot.project_name
-                      : ""
+                <div style={styles.container}>
+                  <FormsyText
+                    hintText="My awesome chatbot"
+                    floatingLabelText="Name"
+                    name="project_name"
+                    onChange={this.handleChange}
+                    fullWidth={true}
+                    value={
+                      chatbot.project_name
+                        ? chatbot.project_name
+                        : ""
+                    }
+                    validations={{
+                      isWords: true
+                    }}
+                    validationErrors={{
+                      isDefaultRequiredValue: "This is a required field"
+                    }}
+                    required
+                  />
+
+                  <FormsyText
+                    hintText="A great description"
+                    floatingLabelText="Description"
+                    name="description"
+                    onChange={this.handleChange}
+                    fullWidth={true}
+                    value={
+                      chatbot.description
+                        ? chatbot.description
+                        : ""
+                    }
+                    validations={{
+                      isWords: true
+                    }}
+                    validationErrors={{
+                      isDefaultRequiredValue: "This is a required field"
+                    }}
+                    required
+                  />
+
+                  <FormsyText
+                    hintText="https://mycompany.com/chatbot/loulou/talk"
+                    floatingLabelText="Chatbot webhook url"
+                    name="webhook_url"
+                    onChange={this.handleChange}
+                    fullWidth={true}
+                    value={
+                      chatbot.webhook_url
+                        ? chatbot.webhook_url
+                        : ""
+                    }
+                    validations={{
+                      isWords: true
+                    }}
+                    validationErrors={{
+                      isDefaultRequiredValue: "This is a required field"
+                    }}
+                    required
+                  />
+
+                  {
+                    this.props.chatbot && this.props.chatbot.response_url && 
+                    <FormsyText
+                      floatingLabelText="Response url"
+                      name="response_url"
+                      fullWidth={true}
+                      value={
+                        this.props.chatbot.response_url ? `${this.props.chatbot.response_url}` : ""
+                      }
+                    />
                   }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
+
+                  <FormsyText
+                    hintText="1"
+                    floatingLabelText="Periodic build in hours (0 to disable)"
+                    name="periodic_build"
+                    onChange={this.handleChange}
+                    fullWidth={true}
+                    value={
+                      chatbot.periodic_build
+                        ? chatbot.periodic_build
+                        : ""
+                    }
+                  />
+                </div>
               </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="A great description"
-                  floatingLabelText="Description"
-                  name="description"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.description
-                      ? chatbot.description
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              {/* <GridTile>
-                <FormsyText
-                  hintText="Dialogflow, watson, fbDirect..."
-                  floatingLabelText="Container mode"
-                  name="container_mode"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.container_mode
-                      ? chatbot.container_mode
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isWords: "Please provide valid container mode",
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                />
-              </GridTile> */}
-
-              <GridTile>
-                <FormsyText
-                  hintText="jojo-owvrog"
-                  floatingLabelText="Dialogflow project ID"
-                  name="dialogflow_project_id"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.dialogflow_project_id
-                      ? chatbot.dialogflow_project_id
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="test-my-chatbot-322@jojo-owvrog.iam.gserviceaccount.com"
-                  floatingLabelText="Dialogflow client email"
-                  name="dialogflow_client_email"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.dialogflow_client_email
-                      ? chatbot.dialogflow_client_email
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCYI..."
-                  floatingLabelText="Dialogflow private key"
-                  name="dialogflow_private_key"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.dialogflow_private_key
-                      ? chatbot.dialogflow_private_key
-                      : ""
-                  }
-                  validations={{
-                    isWords: true
-                  }}
-                  validationErrors={{
-                    isDefaultRequiredValue: "This is a required field"
-                  }}
-                  required
-                />
-              </GridTile>
-
-              <GridTile>
-                <FormsyText
-                  hintText="1"
-                  floatingLabelText="Periodic build (in hours)"
-                  name="periodic_build"
-                  onChange={this.handleChange}
-                  fullWidth={true}
-                  value={
-                    chatbot.periodic_build
-                      ? chatbot.periodic_build
-                      : ""
-                  }
-                />
-              </GridTile>
-
-              {/* <FormControl className={classes.formControl}>
-                <InputLabel>cron (in hours)</InputLabel>
-                <Select
-                  // value={values.age}
-                  // onChange={handleChange}
-                  // inputProps={{
-                  //   name: 'age',
-                  //   id: 'age-simple',
-                  // }}
-                >
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl> */}
             </GridList>
 
             <div style={styles.buttons}>
@@ -328,6 +263,7 @@ function mapStateToProps(state, ownProps) {
   const { isAuthenticated, errorMessage, user } = auth;
   return {
     currentUser: user || {},
+    user: getUserFilteredById(state, user.id) || {},
     chatbot: getChatbotFilteredById(state, ownProps.params.id) || {},
     company: getCompanyById(state, user.companyId),
     chatbotList: getChatbotFilteredByUserList(state).sort(function(a, b){
