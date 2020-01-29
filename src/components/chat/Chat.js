@@ -10,7 +10,7 @@ import { postTests } from "../../actions/testsActions";
 import { postAssertions } from "../../actions/assertionsActions";
 import Popup from "../../components/dashboard/Popup";
 const io = require("socket.io-client");
-let socketio = io.connect(process.env.API_HOST);
+
 let socket;
 
 class Chat extends React.Component {
@@ -45,6 +45,10 @@ class Chat extends React.Component {
     socket.emit('room', `${process.env.ADMIN_TOKEN}-${this.props.user.companyId}-${chatbot.id}-${this.props.user.id}`);
     // 3) receive user
     socket.on('send:message:user', this.messageReceive);
+    let socketio = io.connect(process.env.API_HOST);
+    socketio.on('connect', () => {
+      socketio.emit('room', chatbot.id);
+    });
     socketio.on('message:talk', this.messageReceivedByBot);
   }
 
@@ -101,6 +105,12 @@ class Chat extends React.Component {
       }
     }));
     this.props.talkChatbot(this.props.user.companyId, this.props.user.id, this.props.chatbot.id, data.msg.text)
+    .then(() => {
+      if (this.props.chatbotResponse && 
+          this.props.chatbotResponse.intent && 
+          this.props.chatbotResponse.msg)
+      this.messageReceivedByBot(this.props.chatbotResponse);
+    });
     newMessages.push(data.msg);
     this.setState( {messages : newMessages} );
     window.scrollTo(0, document.body.scrollHeight);

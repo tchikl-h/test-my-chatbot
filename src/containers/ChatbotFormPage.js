@@ -77,7 +77,7 @@ class ChatbotFormPage extends React.Component {
     const field = event ? event.target.name : null;
     const { chatbot } = this.state;
 
-    // this.enableButton();
+    this.enableButton();
     if (chatbot) {
       if (typeof date === "object") {
         let chatbot = Object.assign({}, chatbot);

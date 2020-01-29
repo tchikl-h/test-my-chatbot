@@ -256,7 +256,7 @@ export function talkChatbot(companyId, userId, chatbotId, msg) {
       message: msg
     })
     .then((res) => {
-      if (res.status === 200 && res.data.status === 200) {
+      if (res.status === 200 || res.data.status === 200) {
         dispatch(receiveTalkChatbots(res.data));
       }
       else
